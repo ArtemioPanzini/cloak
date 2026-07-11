@@ -37,17 +37,14 @@ whitepage или страницу блока.
   </Step>
 </Steps>
 
-## Проверка решения
-
-Маршрут для технического reviewer-а объяснит архитектуру, дизайн сигналов,
-scoring policy, edge cases, тесты, trade-offs и работу с AI.
-
-## Интеграция
-
-Практический маршрут покажет чистую установку, environment variables, JS/no-JS
-lifecycle, audit storage, privacy boundary и диагностику.
-
-## Справочник API
-
-Концептуальный overview и OpenAPI 3.1 зафиксируют фактический URL-only контракт,
-redirect semantics и page token behavior.
+<CardGroup cols={3}>
+  <Card title="Проверить решение" icon="list-check" href="/reviewer/evaluation-guide">
+    Архитектура, сигналы, scoring, edge cases, тесты, trade-offs и работа с AI.
+  </Card>
+  <Card title="Запустить и настроить" icon="rocket" href="/integrator/quickstart">
+    Установка, environment variables, JS/no-JS lifecycle, audit и диагностика.
+  </Card>
+  <Card title="Открыть API" icon="square-terminal" href="/api-reference/overview">
+    URL-only контракт, redirect semantics, page token и OpenAPI 3.1.
+  </Card>
+</CardGroup>

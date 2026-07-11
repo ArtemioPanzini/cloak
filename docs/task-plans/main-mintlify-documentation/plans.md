@@ -604,7 +604,7 @@ git commit -m "docs: add OpenAPI contract"
 
 ## Milestone 6: README and release validation
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Goal:** Keep README autonomous, remove stale content and pass all release gates.
 
@@ -618,19 +618,19 @@ git commit -m "docs: add OpenAPI contract"
 - Modify: `README.md`
 - Modify: `docs/index.mdx`
 
-- [ ] **Step 1: Finalize landing links**
+- [x] **Step 1: Finalize landing links**
 
 Replace the three audience summaries in `docs/index.mdx` with Mintlify cards linking to `/reviewer/evaluation-guide`, `/integrator/quickstart` and `/api-reference/overview`. Run `npm run docs:validate` immediately to prove every destination exists.
 
-- [ ] **Step 2: Remove stale top matter**
+- [x] **Step 2: Remove stale top matter**
 
 Remove private `chatgpt.com/c/`, ad-hoc `Todo` and trailing whitespace. Move verified public share links to AI page.
 
-- [ ] **Step 3: Preserve autonomous core**
+- [x] **Step 3: Preserve autonomous core**
 
 Keep purpose, defensive boundary, `npm ci && npm run dev`, checks, destination configuration, short architecture and signal/scoring summary. Link `docs/index.mdx` and `npm run docs:dev`. Replace duplicated detailed tables with canonical MDX links.
 
-- [ ] **Step 4: Verify README**
+- [x] **Step 4: Verify README**
 
 ```bash
 rg -n 'npm ci && npm run dev|npm run docs:dev|docs/index.mdx' README.md
@@ -640,7 +640,7 @@ git diff --check
 
 ### Task 6.2: Automated release gate
 
-- [ ] **Step 1: Clean install and code checks**
+- [x] **Step 1: Clean install and code checks**
 
 ```bash
 npm ci --registry=https://registry.npmjs.org
@@ -652,14 +652,14 @@ test ! -d dist/tests
 
 Expected: existing 19 tests plus new contract tests pass once.
 
-- [ ] **Step 2: Docs checks**
+- [x] **Step 2: Docs checks**
 
 ```bash
 npm run docs:validate
 git diff --check
 ```
 
-- [ ] **Step 3: Scan unfinished/private content**
+- [x] **Step 3: Scan unfinished/private content**
 
 ```bash
 if rg -n 'TBD|TODO|FIXME|chatgpt\.com/c/' README.md docs/index.mdx docs/reviewer docs/integrator docs/api-reference; then exit 1; fi
@@ -668,7 +668,7 @@ if rg -n 'packages\.applied-caas-gateway1|internal\.api\.openai\.org' package-lo
 
 ### Task 6.3: Dual-server smoke
 
-- [ ] **Step 1: Start app and docs separately**
+- [x] **Step 1: Start app and docs separately**
 
 ```bash
 npm run dev
@@ -677,7 +677,7 @@ npm run docs:dev
 
 Expected: ports 3000 and 3333.
 
-- [ ] **Step 2: Smoke both surfaces**
+- [x] **Step 2: Smoke both surfaces**
 
 ```bash
 curl -fsS http://127.0.0.1:3000/health
@@ -685,11 +685,11 @@ curl -fsS http://127.0.0.1:3333/ > /tmp/mintlify-final.html
 rg -n 'Pre-lander Scoring Gate' /tmp/mintlify-final.html
 ```
 
-- [ ] **Step 3: Manual navigation smoke**
+- [x] **Step 3: Manual navigation smoke**
 
 Check four tabs, internal links, Russian titles, API operations, code paths, JS submit, no-JS redirect and audit. Record evidence in `status.md`.
 
-- [ ] **Step 4: Stop previews and inspect scope**
+- [x] **Step 4: Stop previews and inspect scope**
 
 ```bash
 git status -sb
@@ -713,8 +713,8 @@ If no tracked changes remain after earlier commits, record `no commit: final val
 
 ## Overall completion gate
 
-- [ ] Six milestones are `[x]`.
-- [ ] Checkpoint commits and validation are recorded in `status.md`.
-- [ ] Automated and manual gates in `test-plan.md` pass or have an approved exception.
-- [ ] No blocker, private registry URL, placeholder, duplicate test, generated file or secret remains.
-- [ ] `git status -sb` is clean except intentional unpushed commits.
+- [x] Six milestones are `[x]`.
+- [x] Checkpoint commits and validation are recorded in `status.md`.
+- [x] Automated and manual gates in `test-plan.md` pass or have an approved exception.
+- [x] No blocker, private registry URL, placeholder, duplicate test, generated file or secret remains.
+- [x] `git status -sb` is clean except intentional unpushed commits.

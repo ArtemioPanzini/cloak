@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Milestone 5 complete; Milestone 6 is next.
+All six milestones are complete; final checkpoint recording is next.
 
 ## Baseline
 
@@ -27,12 +27,12 @@ Milestone 5 complete; Milestone 6 is next.
 
 ## In progress
 
-- None between checkpoint milestones.
+- Record the final implementation checkpoint and run fresh post-commit verification.
 
 ## Next
 
-1. Execute Milestone 6 from `plans.md`: synchronize README and landing links.
-2. Run clean-install, application, documentation and dual-server release gates.
+1. Commit the final README, landing and execution-log changes.
+2. Run post-commit verification and choose the branch integration action.
 
 ## Decisions
 
@@ -78,8 +78,8 @@ git diff --check
 | 2. Mintlify shell | Complete | `docs: scaffold Mintlify navigation` | `251a8c2` | `mint validate`; preview HTTP 200 on 3333 |
 | 3. Reviewer docs | Complete | `docs: add reviewer evaluation guide` | `3f0cb8b` | `mint validate`; 11/11 scoring scenarios; path/threshold scans pass |
 | 4. Integrator docs | Complete | `docs: add integration guides` | `1b1ef7d` | `mint validate`; 16 config keys; audit-tail behavior verified |
-| 5. OpenAPI | Complete | `docs: add OpenAPI contract` | checkpoint pending | `mint validate`; 8/8 API and token contract tests; diff check pass |
-| 6. Finalization | Pending | `docs: finalize Mintlify documentation` or no commit | — | Pending |
+| 5. OpenAPI | Complete | `docs: add OpenAPI contract` | `648014e` | `mint validate`; 8/8 API and token contract tests; diff check pass |
+| 6. Finalization | Complete | `docs: finalize Mintlify documentation` | checkpoint pending | clean install; 20/20 tests; typecheck/build/docs validation; dual-server smoke |
 
 ## Audit log
 
@@ -93,17 +93,19 @@ git diff --check
 - `2026-07-11`: Milestone 3 completed; eight reviewer pages and complete reviewer navigation validate successfully.
 - `2026-07-11`: Milestone 4 completed; six integrator pages, config coverage and audit behavior validate successfully.
 - `2026-07-11`: Milestone 5 completed; OpenAPI 3.1, API overview and tested HTTP invariants validate successfully.
+- `2026-07-11`: Milestone 6 completed; README synchronized, four-tab docs and all OpenAPI operations smoke-tested, JS/no-JS flows wrote the expected audit decisions.
+- `2026-07-11`: Mintlify preview emits a non-blocking `CodeGroup has no children` warning only for the bodyless `303` response page; `mint validate` passes and a fictitious body was not added to the contract.
 
 ## Smoke/demo checks
 
 | Check | Status | Evidence |
 |---|---|---|
-| App on port 3000 | Deferred | Execution phase |
+| App on port 3000 | Pass | `/health` returned `{\"status\":\"ok\"}`; process stopped after smoke |
 | Mintlify on port 3333 | Pass | Landing preview HTTP 200; process stopped after smoke |
 | Four navigation tabs | Pass | Overview, Solution Review, Integration and API Reference validate |
 | OpenAPI pages | Pass | OpenAPI-backed endpoint group and API overview pass `mint validate` |
-| JS decision flow | Deferred | Final smoke |
-| No-JS redirect flow | Deferred | Final smoke |
+| JS decision flow | Pass | URL-only response selected `/demo/offer`; audit count increased |
+| No-JS redirect flow | Pass | Empty-body `303` selected `/demo/whitepage`; audit count increased |
 
 ## Resume instructions
 
