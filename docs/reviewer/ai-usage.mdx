@@ -1,0 +1,50 @@
+---
+title: "Работа с AI"
+description: "Где AI ускорил разработку, какие предложения были исправлены вручную."
+---
+
+AI использовался как инструмент проектирования и review, но не как источник
+истины для security или scoring decisions.
+
+## Где AI помог
+
+- Разбить проект на telemetry, security, scoring, service и storage boundaries.
+- Сформировать широкий список browser/server/history signals.
+- Подготовить первые table-driven fixtures для обязательных сценариев.
+- Найти повторяющиеся TypeScript shapes и вынести domain interfaces.
+- Проверить README на missing trade-offs и edge cases.
+- Сформулировать negative cases для VPN, mobile, no-JS и repeats.
+
+## Что пришлось исправить вручную
+
+| Первоначальная идея | Финальное решение |
+|---|---|
+| Нет mouse movement → bot | Нейтрально при touch, keyboard, pointer down или dropdown change |
+| VPN/geo mismatch как сильный risk | VPN получил `+5`, mismatch — `0` |
+| Доверять client timing | Добавлен signed server-issued page token и server dwell |
+| Repeat fingerprint подозрителен | Обычный repeat снижает risk; burst оценивается отдельно |
+| Missing telemetry повышает bot score | Missing data снижает coverage |
+| Headless UA + webdriver — две причины block | Оба признака объединены в одну evidence group |
+| Определять reviewer crawler конкретной платформы | Полностью исключено; policy source-agnostic |
+| Использовать native SQLite binding | Выбран portable JSONL repository |
+
+## Как проверялись предложения
+
+- Numeric weights сопоставлялись с обязательными fixtures.
+- False-positive решения проверялись отдельными table cases.
+- HTTP assertions подтверждали, что score/reason не уходят клиенту.
+- Typecheck и deterministic tests запускались после изменений.
+- README сверялся с фактическими routes, config и storage behavior.
+
+AI не определял самостоятельно business thresholds и не создавал real-traffic
+labels. Текущие weights остаются инженерной гипотезой, а не статистически
+калиброванной моделью.
+
+## Публичные материалы
+
+- [Дополнительный разбор проекта в GPT Pro](https://chatgpt.com/share/6a523408-0e5c-83eb-9bef-011bde978a75)
+- [Обсуждение сигналов и архитектуры](https://chatgpt.com/share/6a522370-e2c4-83ed-8450-ac2658bdd883)
+- [Обсуждение тестов и trade-offs](https://chatgpt.com/share/6a52237a-1fa0-83ed-b000-57d127a7c5b8)
+
+Приватная conversation URL не публикуется, потому что она недоступна reviewer-у
+без авторизации владельца.

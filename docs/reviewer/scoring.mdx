@@ -1,0 +1,119 @@
+---
+title: "Scoring model"
+description: "Automation risk, interaction intent, signal coverage и decision thresholds."
+---
+
+Rule engine возвращает три независимых измерения. Все значения детерминированы,
+а каждый adjustment сохраняется в audit.
+
+## `automationRisk`, 0–100
+
+Score начинается с `0`, складывает risk deltas и ограничивается диапазоном
+`0..100`.
+
+| Правило | Risk delta |
+|---|---:|
+| Валидный page token | `-5` |
+| Token отсутствует | `+15` |
+| Token expired | `+5` |
+| Token malformed/future/invalid signature | `+35` |
+| Headless UA | `+45` |
+| Scripted UA (`curl`, `wget`, requests) | `+30` |
+| `navigator.webdriver === true` | `+35` |
+| Server dwell `<250 ms` | `+45` |
+| Server dwell `250–599 ms` | `+18` |
+| Server dwell `600–799 ms` | `+5` |
+| Contradictory event order | `+35` |
+| Telemetry есть, interaction отсутствует | `+8` |
+| 1 / 2 / 3+ device anomalies | `+12 / +30 / +45` |
+| VPN / proxy / hosting | `+5 / +8 / +12` |
+| 2–3 / 4–9 / 10+ identity submits за 30 s | `+10 / +45 / +80` |
+| 30+ submits с shared IP за 30 s | `+20` |
+| Token reuse 2–4 / 5+ раз | `+15 / +45` |
+| Обычный repeat visit | `-5` |
+
+Risk adjustments группируются как `form`, `request`, `token`, `automation`,
+`behavior`, `device`, `network`, `velocity` и `history`. В список
+`suspiciousGroups` попадают adjustments с delta не меньше `10`.
+
+Headless UA и webdriver находятся в одной группе `automation`. Поэтому два
+коррелированных признака не становятся двумя независимыми доказательствами.
+
+<Warning>
+  Invalid, malformed или future page token добавляет `+35`, но сам по себе не
+  запрещает `OFFER`: threshold whitepage равен `40`, и итог зависит от остальных
+  adjustments и coverage. Это описание текущей policy, а не рекомендация для
+  production hardening.
+</Warning>
+
+## `intentScore`, 0–100
+
+Intent начинается с `40`. Это proxy качества взаимодействия, а не prediction
+покупки.
+
+| Правило | Intent delta |
+|---|---:|
+| Валидный state | `+5` |
+| Malformed telemetry | `-10` |
+| Dwell `<250 ms` | `-30` |
+| Dwell `250–599 ms` | `-15` |
+| Dwell `600–799 ms` | `-5` |
+| Dwell `800 ms–20 s` | `+15` |
+| Dwell `20–120 s` | `+8` |
+| Dwell `>120 s` | `+3` |
+| Coherent event order | `+15` |
+| Contradictory event order | `-20` |
+| Dropdown change | `+20` |
+| Pointer/touch/keyboard input | `+10` |
+| Страница visible не меньше 65% client time | `+5` |
+| Обычный repeat visit | `+5` |
+
+## `coverage`, 0–1
+
+Coverage измеряет наличие evidence, а не подозрительность.
+
+| Компонент | Максимальный вклад |
+|---|---:|
+| Valid page token | `0.20` |
+| Expired token | `0.10` |
+| UA, Accept, Accept-Language | `0.15` |
+| Server dwell | `0.10` |
+| Client submitted time | `0.10` |
+| Пять interaction fields | `0.20` |
+| Screen | `0.06` |
+| Timezone | `0.03` |
+| Languages | `0.03` |
+| Hardware/device context | `0.03` |
+| History lookup | `0.10` |
+
+Missing telemetry не увеличивает bot risk автоматически. Она уменьшает coverage,
+поэтому no-JS пользователь обычно получает fallback, а не обвинение в automation.
+
+## Decision policy
+
+```text
+invalid state
+  -> BLOCK
+
+EXTREME_SUBMIT_BURST
+  -> BLOCK
+
+automationRisk >= 75 AND suspiciousGroups >= 2
+  -> BLOCK
+
+coverage < 0.60
+  -> WHITEPAGE
+
+automationRisk >= 40
+  -> WHITEPAGE
+
+intentScore < 35
+  -> WHITEPAGE
+
+otherwise
+  -> OFFER
+```
+
+- `OFFER`: достаточно evidence и согласованное взаимодействие.
+- `WHITEPAGE`: неопределённость, низкая coverage или одна сильная anomaly.
+- `BLOCK`: invalid form, extreme identity burst или несколько независимых групп.

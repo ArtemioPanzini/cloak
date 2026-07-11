@@ -1,0 +1,86 @@
+---
+title: "Быстрый старт"
+description: "Чистая установка, demo-запуск и первая проверка audit log."
+---
+
+## Требования
+
+- Node.js 20 или новее.
+- npm с доступом к `https://registry.npmjs.org`.
+
+## Установка и запуск
+
+```bash
+npm ci
+npm run dev
+```
+
+Сервер доступен по адресам:
+
+- pre-lander: [http://localhost:3000](http://localhost:3000);
+- health: [http://localhost:3000/health](http://localhost:3000/health).
+
+Приложение работает без `.env`. Development defaults используют локальные demo
+destinations и безопасны только для локальной проверки. В логах появится warning
+о development secrets.
+
+## Первый submit
+
+1. Откройте `/`.
+2. Выберите штат.
+3. Нажмите `Submit`.
+
+JavaScript отправит `POST /api/decision`, получит plain-text URL и выполнит
+navigation. При согласованных сигналах default destination — `/demo/offer`.
+
+## Настройка destinations
+
+```bash
+cp .env.example .env
+```
+
+Измените как минимум secrets и URLs:
+
+```dotenv
+PAGE_TOKEN_SECRET=replace-with-at-least-24-characters
+HASH_SECRET=replace-with-at-least-24-characters
+COOKIE_SECRET=replace-with-at-least-24-characters
+OFFER_URL=https://destination.example/offer
+WHITEPAGE_URL=https://destination.example/info
+BLOCK_URL=https://destination.example/blocked
+```
+
+Перезапустите dev process после изменения `.env`.
+
+## Проверка audit
+
+```bash
+npm run audit:tail -- 10
+```
+
+Raw JSONL находится в `data/audit.jsonl`. Файл создаётся после первой decision и
+исключён из Git.
+
+## Проверки проекта
+
+```bash
+npm test
+npm run typecheck
+npm run build
+```
+
+## Документация локально
+
+В отдельном terminal:
+
+```bash
+npm run docs:dev
+```
+
+Mintlify использует [http://localhost:3333](http://localhost:3333), поэтому не
+конфликтует с приложением на `3000`.
+
+<Warning>
+  Не включайте `TRUST_PROXY` или `TRUST_ENRICHMENT_HEADERS`, пока собственный
+  reverse proxy не очищает входящие forwarding/enrichment headers.
+</Warning>

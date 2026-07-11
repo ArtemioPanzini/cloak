@@ -1,0 +1,79 @@
+---
+title: "Проверка решения за 10 минут"
+description: "Короткий маршрут воспроизведения тестов, HTTP-потоков и audit log."
+---
+
+Эта страница позволяет проверить ключевые свойства решения без чтения всей
+документации и исходного кода.
+
+## 1. Чистая установка
+
+```bash
+npm ci
+```
+
+Требуется Node.js 20 или новее. Установка использует публичный npm registry и
+закреплённый `package-lock.json`.
+
+## 2. Автоматические проверки
+
+```bash
+npm test
+npm run typecheck
+npm run build
+```
+
+Ожидаемый baseline до добавления новых contract assertions — 4 test files и
+19 уникальных тестов. Production build компилирует только `src/` и не создаёт
+копии тестов в `dist/tests`.
+
+## 3. Запуск приложения
+
+```bash
+npm run dev
+```
+
+Откройте [http://localhost:3000](http://localhost:3000). Страница должна
+содержать только dropdown штатов и кнопку `Submit`.
+
+## 4. Проверка обычного submit
+
+1. Выберите штат.
+2. Подождите около секунды.
+3. Нажмите `Submit`.
+
+При согласованных browser/server signals demo-конфигурация направляет на
+`/demo/offer`. Endpoint `POST /api/decision` возвращает только URL как
+`text/plain`; score и причины клиенту не раскрываются.
+
+## 5. Проверка no-JS flow
+
+Отключите JavaScript или отправьте HTML-форму напрямую. `POST /submit`
+возвращает `303 Location`. Hidden page token сохраняется, но client telemetry
+отсутствует, поэтому coverage обычно недостаточна и demo-решение ведёт на
+`/demo/whitepage`.
+
+## 6. Проверка audit
+
+```bash
+npm run audit:tail -- 2
+```
+
+Последние решения находятся в `data/audit.jsonl`. Запись включает входные
+данные, нормализованные сигналы, history snapshot, adjustments, итоговые score,
+decision, destination URL и primary reason.
+
+## Критерий → документация → код → тест
+
+| Что проверить | Документация | Код | Тест |
+|---|---|---|---|
+| Подписанный page token | [Архитектура](/reviewer/architecture) | [`src/security/page-token.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/src/security/page-token.ts) | [`tests/page-token.test.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/tests/page-token.test.ts) |
+| Дизайн сигналов | [Сигналы](/reviewer/signals) | [`src/telemetry/`](https://github.com/ArtemioPanzini/cloak/tree/main/src/telemetry) | [`tests/fixtures.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/tests/fixtures.ts) |
+| Scoring и policy | [Scoring model](/reviewer/scoring) | [`src/scoring/`](https://github.com/ArtemioPanzini/cloak/tree/main/src/scoring) | [`tests/scoring.scenarios.test.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/tests/scoring.scenarios.test.ts) |
+| Audit и history | [Audit log](/integrator/audit-log) | [`src/storage/decision-repository.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/src/storage/decision-repository.ts) | [`tests/repository.test.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/tests/repository.test.ts) |
+| URL-only HTTP contract | [Справочник API](/api-reference/overview) | [`src/app.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/src/app.ts) | [`tests/app.test.ts`](https://github.com/ArtemioPanzini/cloak/blob/main/tests/app.test.ts) |
+
+<Note>
+  Network type и geo region появляются только за доверенным reverse proxy при
+  `TRUST_ENRICHMENT_HEADERS=true`. Клиент не может прислать их в JSON body.
+</Note>

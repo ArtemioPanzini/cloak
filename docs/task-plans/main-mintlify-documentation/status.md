@@ -2,11 +2,11 @@
 
 ## Current phase
 
-Planning complete; implementation not started.
+All six milestones and post-commit verification are complete.
 
 ## Baseline
 
-- Branch: `main`.
+- Planning branch: `main`; execution branch: `agent/mintlify-documentation`.
 - Design spec commit: `1065047 docs: design Mintlify documentation`.
 - Remote baseline: `origin/main` at `46cc31b` when planning started.
 - Worktree before task-pack creation: clean, with local branch ahead by the design-spec commit.
@@ -27,12 +27,11 @@ Planning complete; implementation not started.
 
 ## In progress
 
-- None. This run is planning-only.
+- None.
 
 ## Next
 
-1. Execute Milestone 1 from `plans.md`: make package installation, build output and test discovery reproducible.
-2. Record validation and checkpoint commit before Milestone 2.
+1. Choose whether to merge, push or keep `agent/mintlify-documentation` for review.
 
 ## Decisions
 
@@ -55,10 +54,9 @@ Planning complete; implementation not started.
 
 ## Known blockers and risks
 
-- `package-lock.json` contains private OpenAI Artifactory URLs.
-- `npm run build` emits `dist/tests`; Vitest can execute compiled test copies.
-- Mintlify is not installed or configured.
 - Manual OpenAPI can drift unless contract assertions remain a release gate.
+- Mintlify dev dependencies currently report 12 moderate advisories; `npm audit --omit=dev` reports 0 runtime vulnerabilities.
+- Mintlify's `twoslash` dependency declares TypeScript 5/6 peer support while the project uses TypeScript 7; installation succeeds with an npm peer warning.
 
 ## Validation commands
 
@@ -75,29 +73,39 @@ git diff --check
 
 | Milestone | Status | Planned commit | Actual commit | Validation |
 |---|---|---|---|---|
-| 1. Reproducible toolchain | Pending | `build: make docs toolchain reproducible` | — | Pending |
-| 2. Mintlify shell | Pending | `docs: scaffold Mintlify navigation` | — | Pending |
-| 3. Reviewer docs | Pending | `docs: add reviewer evaluation guide` | — | Pending |
-| 4. Integrator docs | Pending | `docs: add integration guides` | — | Pending |
-| 5. OpenAPI | Pending | `docs: add OpenAPI contract` | — | Pending |
-| 6. Finalization | Pending | `docs: finalize Mintlify documentation` or no commit | — | Pending |
+| 1. Reproducible toolchain | Complete | `build: make docs toolchain reproducible` | `bfd7709` | 19/19 tests; typecheck/build pass; clean install pass; runtime audit 0 |
+| 2. Mintlify shell | Complete | `docs: scaffold Mintlify navigation` | `251a8c2` | `mint validate`; preview HTTP 200 on 3333 |
+| 3. Reviewer docs | Complete | `docs: add reviewer evaluation guide` | `3f0cb8b` | `mint validate`; 11/11 scoring scenarios; path/threshold scans pass |
+| 4. Integrator docs | Complete | `docs: add integration guides` | `1b1ef7d` | `mint validate`; 16 config keys; audit-tail behavior verified |
+| 5. OpenAPI | Complete | `docs: add OpenAPI contract` | `648014e` | `mint validate`; 8/8 API and token contract tests; diff check pass |
+| 6. Finalization | Complete | `docs: finalize Mintlify documentation` | `70883ae` | clean install; 20/20 tests; typecheck/build/docs validation; dual-server smoke |
 
 ## Audit log
 
 - `2026-07-11`: Design spec approved by user.
 - `2026-07-11`: Planning pack created; implementation deliberately not started.
 - `2026-07-11`: Missing Jaidu template files recorded as a skill-package limitation.
+- `2026-07-11`: Isolated worktree created on `agent/mintlify-documentation`; baseline 19/19 passed.
+- `2026-07-11`: Milestone 1 completed; private registry URLs removed, Mint CLI pinned, source-only build and unique test discovery verified.
+- `2026-07-11`: Clean install reports dev-only advisories/TypeScript peer warning; runtime audit remains clean.
+- `2026-07-11`: Milestone 2 completed; Mintlify config validates and landing preview returned HTTP 200 on port 3333.
+- `2026-07-11`: Milestone 3 completed; eight reviewer pages and complete reviewer navigation validate successfully.
+- `2026-07-11`: Milestone 4 completed; six integrator pages, config coverage and audit behavior validate successfully.
+- `2026-07-11`: Milestone 5 completed; OpenAPI 3.1, API overview and tested HTTP invariants validate successfully.
+- `2026-07-11`: Milestone 6 completed; README synchronized, four-tab docs and all OpenAPI operations smoke-tested, JS/no-JS flows wrote the expected audit decisions.
+- `2026-07-11`: Mintlify preview emits a non-blocking `CodeGroup has no children` warning only for the bodyless `303` response page; `mint validate` passes and a fictitious body was not added to the contract.
+- `2026-07-11`: Fresh post-commit release gate passed on `70883ae`: 20/20 tests, typecheck, source-only build, Mintlify validation and private-content scans.
 
 ## Smoke/demo checks
 
 | Check | Status | Evidence |
 |---|---|---|
-| App on port 3000 | Deferred | Execution phase |
-| Mintlify on port 3333 | Not run | Mintlify not implemented |
-| Four navigation tabs | Not run | Mintlify not implemented |
-| OpenAPI pages | Not run | OpenAPI not implemented |
-| JS decision flow | Deferred | Final smoke |
-| No-JS redirect flow | Deferred | Final smoke |
+| App on port 3000 | Pass | `/health` returned `{\"status\":\"ok\"}`; process stopped after smoke |
+| Mintlify on port 3333 | Pass | Landing preview HTTP 200; process stopped after smoke |
+| Four navigation tabs | Pass | Overview, Solution Review, Integration and API Reference validate |
+| OpenAPI pages | Pass | OpenAPI-backed endpoint group and API overview pass `mint validate` |
+| JS decision flow | Pass | URL-only response selected `/demo/offer`; audit count increased |
+| No-JS redirect flow | Pass | Empty-body `303` selected `/demo/whitepage`; audit count increased |
 
 ## Resume instructions
 

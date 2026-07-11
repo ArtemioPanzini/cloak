@@ -44,6 +44,21 @@ afterEach(async () => {
 });
 
 describe("HTTP application", () => {
+  it("exposes a JSON health contract", async () => {
+    const built = await buildApp({
+      config: testConfig(),
+      repository: new JsonlDecisionRepository(":memory:"),
+      logger: false
+    });
+    apps.push(built.app);
+
+    const response = await built.app.inject({ method: "GET", url: "/health" });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.headers["content-type"]).toContain("application/json");
+    expect(response.json()).toEqual({ status: "ok" });
+  });
+
   it("returns only the offer URL and writes a full audit record", async () => {
     let nowMs = 1_700_000_000_000;
     const repository = new JsonlDecisionRepository(":memory:");
@@ -102,8 +117,9 @@ describe("HTTP application", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toBe(built.config.offerUrl);
     expect(response.headers["content-type"]).toContain("text/plain");
-    expect(response.body).not.toContain("score");
-    expect(response.body).not.toContain("reason");
+    for (const internalKey of ["score", "reason", "decision", "signals"]) {
+      expect(response.body).not.toContain(internalKey);
+    }
 
     const records = await repository.getAll();
     expect(records).toHaveLength(1);
@@ -144,6 +160,8 @@ describe("HTTP application", () => {
 
     expect(response.statusCode).toBe(303);
     expect(response.headers.location).toBe(built.config.whitepageUrl);
+    expect(response.headers["cache-control"]).toBe("no-store");
+    expect(response.body).toBe("");
   });
 
 

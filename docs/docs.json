@@ -1,0 +1,72 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Pre-lander Scoring Gate",
+  "colors": {
+    "primary": "#0F766E",
+    "light": "#14B8A6",
+    "dark": "#5EEAD4"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Обзор",
+        "icon": "house",
+        "pages": ["index"]
+      },
+      {
+        "tab": "Проверка решения",
+        "icon": "clipboard-check",
+        "groups": [
+          {
+            "group": "Быстрая проверка",
+            "pages": ["reviewer/evaluation-guide"]
+          },
+          {
+            "group": "Дизайн решения",
+            "pages": [
+              "reviewer/architecture",
+              "reviewer/signals",
+              "reviewer/scoring",
+              "reviewer/edge-cases"
+            ]
+          },
+          {
+            "group": "Качество и процесс",
+            "pages": [
+              "reviewer/testing",
+              "reviewer/tradeoffs",
+              "reviewer/ai-usage"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Интеграция",
+        "icon": "plug",
+        "pages": [
+          "integrator/quickstart",
+          "integrator/configuration",
+          "integrator/request-lifecycle",
+          "integrator/audit-log",
+          "integrator/privacy-and-security",
+          "integrator/troubleshooting"
+        ]
+      },
+      {
+        "tab": "Справочник API",
+        "icon": "square-terminal",
+        "groups": [
+          {
+            "group": "Контракт",
+            "pages": ["api-reference/overview"]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "api-reference/openapi.yaml"
+          }
+        ]
+      }
+    ]
+  }
+}

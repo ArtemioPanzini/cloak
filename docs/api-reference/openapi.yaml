@@ -1,0 +1,272 @@
+openapi: 3.1.0
+info:
+  title: Pre-lander Scoring Gate API
+  version: 1.0.0
+  description: |
+    HTTP-контракт source-agnostic pre-lander. Decision endpoint возвращает
+    только destination URL как `text/plain`; score, reasons и signals доступны
+    исключительно в server-side audit.
+servers:
+  - url: http://localhost:3000
+    description: Локальный demo server
+tags:
+  - name: Landing
+    description: Получение pre-lander и server-issued evidence.
+  - name: Decision
+    description: JavaScript и no-JS submit flows.
+  - name: Operations
+    description: Проверка состояния процесса.
+paths:
+  /health:
+    get:
+      tags: [Operations]
+      operationId: getHealth
+      summary: Проверить состояние процесса
+      responses:
+        "200":
+          description: Процесс принимает HTTP requests.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: ok
+  /:
+    get:
+      tags: [Landing]
+      operationId: getPrelander
+      summary: Получить pre-lander
+      description: |
+        Возвращает минимальную HTML-форму, hidden signed page token и signed
+        visitor cookie. Cookie создаётся только при отсутствии валидной cookie.
+      responses:
+        "200":
+          description: HTML pre-lander со списком штатов.
+          headers:
+            Set-Cookie:
+              description: Signed `prelander_visit` cookie при создании visitor identity.
+              schema:
+                type: string
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            text/html:
+              schema:
+                type: string
+              example: "<!doctype html><html><body><form id=\"state-form\">...</form></body></html>"
+  /api/decision:
+    post:
+      tags: [Decision]
+      operationId: createDecision
+      summary: Получить destination URL
+      description: |
+        JavaScript flow. Сервер нормализует недоверенный payload, проверяет
+        page token, загружает history, рассчитывает score и пишет audit до
+        отправки ответа. Invalid token добавляет risk, но сам по себе не создаёт
+        абсолютного запрета `OFFER` в текущей policy.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DecisionRequest"
+            examples:
+              liveUser:
+                summary: Согласованное взаимодействие
+                value:
+                  state: CA
+                  pageToken: signed-token-from-get-root
+                  telemetry:
+                    pageVisibleMs: 1750
+                    firstInteractionMs: 480
+                    stateChangedMs: 1050
+                    submittedMs: 1800
+                    pointerMoves: 12
+                    pointerDowns: 2
+                    touchStarts: 0
+                    keyDowns: 0
+                    stateChanges: 1
+                    webdriver: false
+                    timezone: America/Los_Angeles
+                    languages: [en-US, en]
+                    screen:
+                      width: 1440
+                      height: 900
+                      colorDepth: 24
+                    hardwareConcurrency: 8
+                    deviceMemory: 8
+                    maxTouchPoints: 0
+                    fingerprintId: 0123456789abcdef0123456789abcdef
+      responses:
+        "200":
+          description: |
+            Единственный destination URL: offer, whitepage или block. Parser и
+            decision errors по возможности сохраняют этот внешний контракт.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+          content:
+            text/plain:
+              schema:
+                type: string
+                format: uri
+              examples:
+                offer:
+                  value: http://localhost:3000/demo/offer
+                whitepage:
+                  value: http://localhost:3000/demo/whitepage
+                block:
+                  value: http://localhost:3000/demo/blocked
+  /submit:
+    post:
+      tags: [Decision]
+      operationId: submitWithoutJavaScript
+      summary: Отправить HTML-форму без JavaScript
+      description: |
+        Native form fallback. Client telemetry отсутствует, поэтому coverage
+        обычно ниже threshold. Решение записывается в тот же audit pipeline.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/FormDecisionRequest"
+      responses:
+        "303":
+          description: Redirect на выбранный destination.
+          headers:
+            Location:
+              required: true
+              description: Absolute offer, whitepage или block URL.
+              schema:
+                type: string
+                format: uri
+            Cache-Control:
+              schema:
+                type: string
+                const: no-store
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      additionalProperties: false
+      properties:
+        status:
+          type: string
+          const: ok
+    DecisionRequest:
+      type: object
+      required: [state]
+      properties:
+        state:
+          $ref: "#/components/schemas/StateCode"
+        pageToken:
+          type: string
+          maxLength: 4096
+          description: Token из hidden input ответа `GET /`.
+        telemetry:
+          $ref: "#/components/schemas/ClientTelemetry"
+    FormDecisionRequest:
+      type: object
+      required: [state]
+      properties:
+        state:
+          $ref: "#/components/schemas/StateCode"
+        pageToken:
+          type: string
+          maxLength: 4096
+    StateCode:
+      type: string
+      minLength: 2
+      maxLength: 2
+      pattern: "^[A-Za-z]{2}$"
+      description: US state или District of Columbia code; backend нормализует uppercase.
+      example: CA
+    ClientTelemetry:
+      type: object
+      description: |
+        Полностью недоверенный browser context. Наличие поля повышает coverage,
+        но клиент может подделать любое значение.
+      properties:
+        pageVisibleMs:
+          $ref: "#/components/schemas/ClientTime"
+        firstInteractionMs:
+          $ref: "#/components/schemas/ClientTime"
+        stateChangedMs:
+          $ref: "#/components/schemas/ClientTime"
+        submittedMs:
+          $ref: "#/components/schemas/ClientTime"
+        pointerMoves:
+          $ref: "#/components/schemas/EventCount"
+        pointerDowns:
+          $ref: "#/components/schemas/EventCount"
+        touchStarts:
+          $ref: "#/components/schemas/EventCount"
+        keyDowns:
+          $ref: "#/components/schemas/EventCount"
+        stateChanges:
+          $ref: "#/components/schemas/EventCount"
+        focusCount:
+          $ref: "#/components/schemas/EventCount"
+        blurCount:
+          $ref: "#/components/schemas/EventCount"
+        visibilityChanges:
+          $ref: "#/components/schemas/EventCount"
+        webdriver:
+          type: boolean
+        timezone:
+          type: string
+          maxLength: 128
+          example: America/Los_Angeles
+        languages:
+          type: array
+          maxItems: 16
+          items:
+            type: string
+            maxLength: 64
+        screen:
+          $ref: "#/components/schemas/ClientScreen"
+        hardwareConcurrency:
+          type: number
+          minimum: 0
+          maximum: 10000
+        deviceMemory:
+          type: number
+          minimum: 0
+          maximum: 10000
+        maxTouchPoints:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        fingerprintId:
+          type: string
+          maxLength: 128
+          description: Coarse client hash; используется только как слабый history key.
+    ClientTime:
+      type: number
+      minimum: 0
+      maximum: 86400000
+    EventCount:
+      type: integer
+      minimum: 0
+      maximum: 1000000
+    ClientScreen:
+      type: object
+      properties:
+        width:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        height:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        colorDepth:
+          type: integer
+          minimum: 0
+          maximum: 1024

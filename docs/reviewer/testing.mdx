@@ -1,0 +1,73 @@
+---
+title: "Тестирование"
+description: "Обязательные scoring-сценарии, HTTP contract, token и repository coverage."
+---
+
+Baseline содержит 19 уникальных тестов в четырёх source test files. Production
+build не компилирует `tests/`, а Vitest исключает `dist/**`, поэтому один тест не
+запускается повторно из generated output.
+
+## Test suites
+
+| Suite | Проверяет |
+|---|---|
+| `scoring.scenarios.test.ts` | 10 table-driven decisions и independent-group policy |
+| `app.test.ts` | URL-only response, no-JS redirect, malformed JSON audit, invalid state |
+| `page-token.test.ts` | Valid signature, tampering и expiration |
+| `repository.test.ts` | JSONL persistence и history rebuild после restart |
+
+## Обязательные сценарии
+
+| Сценарий | Expected |
+|---|---|
+| Чистый живой пользователь | `OFFER` |
+| Быстрый кликер | `WHITEPAGE` |
+| Headless bot без mouse movement | `BLOCK` |
+| Живой пользователь под VPN | `OFFER` |
+| Mobile с медленным submit | `OFFER` |
+| Suspicious fingerprint/device | `WHITEPAGE` |
+| JavaScript отключён | `WHITEPAGE` |
+| Repeat fingerprint без burst | `OFFER` |
+
+Дополнительно проверяются extreme identity burst, geo mismatch и высокий risk из
+одной correlated evidence group.
+
+## HTTP integration
+
+Fastify `inject()` проверяет реальный route/service/repository pipeline без
+сетевого порта:
+
+- landing выдаёт page token и signed cookie;
+- decision endpoint отвечает только configured URL;
+- score/reason не появляются в body;
+- native form получает `303 Location`;
+- malformed JSON превращается в synthetic audit input;
+- audit содержит raw body, normalized signals и score.
+
+## Как запустить
+
+```bash
+npm test
+npm test -- tests/scoring.scenarios.test.ts
+npm test -- tests/app.test.ts
+```
+
+Дополнительные gates:
+
+```bash
+npm run typecheck
+npm run build
+npm run docs:validate
+```
+
+## Известные пробелы
+
+- Нет browser E2E, исполняющего настоящий `public/telemetry.js`.
+- Suspicious fingerprint fixture объединяет fingerprint с несколькими device anomalies.
+- Repeat fingerprint проверяется через synthetic history, а не двумя HTTP requests.
+- Нет полного набора boundary tests для `249/250`, `599/600`, `0.59/0.60` и thresholds risk.
+- Нет concurrency test для одновременного history lookup и append.
+- Нет real-traffic labels для false-positive/false-negative calibration.
+
+Эти пробелы не скрываются за количеством unit tests: текущий набор проверяет
+детерминированность выбранной policy, а не её статистическую точность в production.

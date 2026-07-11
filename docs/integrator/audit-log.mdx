@@ -1,0 +1,107 @@
+---
+title: "Audit log и history"
+description: "Формат JSONL, просмотр решений, восстановление history и ограничения storage."
+---
+
+Каждая завершённая decision добавляет одну JSON-строку в файл, заданный
+`DATA_FILE`. Default:
+
+```text
+./data/audit.jsonl
+```
+
+## Что хранится
+
+| Раздел | Содержимое |
+|---|---|
+| Identity | HMAC visitor, fingerprint, IP и token nonce keys |
+| Incoming | Raw request body, normalized client/server signals, payload issues |
+| History | Snapshot counters до текущей decision |
+| Score | Risk, intent, coverage, groups, reason codes и adjustments |
+| Outcome | Decision, destination URL и primary reason |
+| Metadata | UUID record, timestamp и Fastify request ID |
+
+Сокращённый пример:
+
+```json
+{
+  "timestamp": "2026-07-11T10:00:00.000Z",
+  "identifiers": {
+    "visitorKey": "hmac-hex",
+    "fingerprintKey": "hmac-hex",
+    "ipHash": "hmac-hex"
+  },
+  "incoming": {
+    "rawBody": { "state": "CA" },
+    "normalized": {
+      "form": { "state": "CA", "validState": true },
+      "server": { "ip": "203.0.113.10", "pageTokenStatus": "valid" }
+    }
+  },
+  "score": {
+    "automationRisk": 0,
+    "intentScore": 100,
+    "coverage": 1
+  },
+  "decision": "OFFER",
+  "primaryReason": "HUMAN_LIKE_INTERACTION"
+}
+```
+
+<Warning>
+  Текущая audit record хранит не только `ipHash`, но и raw server IP внутри
+  normalized signals. Raw request body также сохраняется полностью в пределах
+  Fastify body limit.
+</Warning>
+
+## Просмотр
+
+```bash
+npm run audit:tail
+npm run audit:tail -- 25
+```
+
+Script показывает до 100 последних записей в компактной таблице. Если файл ещё
+не создан, команда выводит `No audit file found` и завершается без ошибки.
+
+Raw просмотр:
+
+```bash
+tail -n 1 data/audit.jsonl | jq
+```
+
+## Восстановление history
+
+При старте repository читает JSONL построчно и восстанавливает in-memory records.
+Пустые или повреждённые строки пропускаются, чтобы один partial append не блокировал
+запуск.
+
+Для каждого request считаются:
+
+- previous visitor/fingerprint/IP decisions;
+- visitor/fingerprint/IP submits за 30 секунд;
+- fingerprint submits за 5 минут;
+- previous page-token uses;
+- время последней visitor/fingerprint decision.
+
+## Запись и concurrency
+
+Один process сериализует `appendFile()` через promise write chain, поэтому JSON
+строки не перемешиваются внутри process. Это не даёт:
+
+- multi-process locking;
+- atomic history-read-plus-append;
+- indexes или bounded memory;
+- retention и automatic rotation;
+- encryption at rest.
+
+## Retention guidance
+
+Для внешнего окружения рекомендуется:
+
+- не сохранять raw IP либо шифровать его;
+- минимизировать raw headers/body;
+- ввести короткий retention period;
+- ограничить доступ к audit;
+- ротировать HMAC secrets с планом history migration;
+- перенести audit в durable event storage.

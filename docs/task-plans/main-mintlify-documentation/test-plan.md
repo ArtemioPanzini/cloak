@@ -152,15 +152,15 @@ rg -n 'Pre-lander Scoring Gate' /tmp/mintlify-smoke.html
 
 Manual checks:
 
-- `[ ]` Overview routes to three destinations.
-- `[ ]` Solution review contains the 10-minute guide.
-- `[ ]` Integration contains quickstart, config, lifecycle, audit, privacy and troubleshooting.
-- `[ ]` API reference displays overview and operations.
-- `[ ]` Russian titles render correctly.
-- `[ ]` Internal links and code paths resolve.
-- `[ ]` JS submit returns offer URL and writes audit.
-- `[ ]` No-JS submit returns `303` to whitepage and writes audit.
-- `[ ]` Preview processes stop cleanly.
+- `[x]` Overview routes to three destinations.
+- `[x]` Solution review contains the 10-minute guide.
+- `[x]` Integration contains quickstart, config, lifecycle, audit, privacy and troubleshooting.
+- `[x]` API reference displays overview and operations.
+- `[x]` Russian titles render correctly.
+- `[x]` Internal links and code paths resolve.
+- `[x]` JS submit returns offer URL and writes audit.
+- `[x]` No-JS submit returns `303` to whitepage and writes audit.
+- `[x]` Preview processes stop cleanly.
 
 ## Acceptance gates
 

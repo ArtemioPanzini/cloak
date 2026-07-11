@@ -1,0 +1,50 @@
+---
+title: "Pre-lander Scoring Gate"
+description: "Объяснимый pre-lander для оценки качества взаимодействия и выбора destination URL."
+---
+
+Pre-lander принимает короткое взаимодействие с формой, объединяет браузерные,
+серверные и исторические сигналы и возвращает только destination URL: оффер,
+whitepage или страницу блока.
+
+<Note>
+  Решение source-agnostic: оно не ищет модераторов конкретной рекламной платформы
+  и применяет одинаковые правила ко всем посетителям. Client telemetry считается
+  недоверенной и никогда не используется как единственное доказательство автоматизации.
+</Note>
+
+## Как проходит решение
+
+<Steps>
+  <Step title="Получение pre-lander">
+    Сервер выдаёт минимальную HTML-форму, подписанную visitor cookie и page token.
+  </Step>
+  <Step title="Сбор контекста">
+    Браузер агрегирует timing, interaction и device signals без записи полного
+    поведенческого trace.
+  </Step>
+  <Step title="Нормализация и история">
+    Backend проверяет token, строит server signals и загружает предыдущие решения
+    для visitor, fingerprint, IP и token nonce.
+  </Step>
+  <Step title="Scoring и policy">
+    Rule engine рассчитывает automation risk, interaction intent и signal coverage,
+    после чего выбирает `OFFER`, `WHITEPAGE` или `BLOCK`.
+  </Step>
+  <Step title="Ответ и audit">
+    Клиент получает только URL, а полный вход, score, решение и причина сохраняются
+    в JSONL audit log.
+  </Step>
+</Steps>
+
+<CardGroup cols={3}>
+  <Card title="Проверить решение" icon="list-check" href="/reviewer/evaluation-guide">
+    Архитектура, сигналы, scoring, edge cases, тесты, trade-offs и работа с AI.
+  </Card>
+  <Card title="Запустить и настроить" icon="rocket" href="/integrator/quickstart">
+    Установка, environment variables, JS/no-JS lifecycle, audit и диагностика.
+  </Card>
+  <Card title="Открыть API" icon="square-terminal" href="/api-reference/overview">
+    URL-only контракт, redirect semantics, page token и OpenAPI 3.1.
+  </Card>
+</CardGroup>
