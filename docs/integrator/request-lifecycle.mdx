@@ -1,0 +1,85 @@
+---
+title: "Жизненный цикл запроса"
+description: "Полные JavaScript и no-JS потоки от landing request до navigation."
+---
+
+Оба потока используют одну normalization, scoring и audit pipeline. Различается
+только способ submit и внешний HTTP-ответ.
+
+## JavaScript flow
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant A as Fastify app
+  participant S as DecisionService
+  participant R as Repository
+  B->>A: GET /
+  A-->>B: HTML + signed cookie + page token
+  Note over B: Collect aggregate telemetry
+  B->>A: POST /api/decision (JSON)
+  A->>S: request context
+  S->>S: normalize + verify token + hash identifiers
+  S->>R: getHistory(keys)
+  R-->>S: history snapshot
+  S->>S: scoreVisitor + resolveDecision
+  S->>R: append(audit record)
+  S-->>A: destination URL
+  A-->>B: 200 text/plain URL
+  B->>B: window.location.assign(URL)
+```
+
+1. `GET /` создаёт visitor UUID, если signed cookie отсутствует или невалидна.
+2. Сервер выпускает HMAC-signed page token с timestamp и random nonce.
+3. `telemetry.js` собирает агрегаты до submit.
+4. JSON payload проходит type/range normalization.
+5. Backend строит server signals из headers, IP и token verification.
+6. HMAC identifiers используются для history lookup.
+7. Pure rule engine рассчитывает score и decision.
+8. Audit записывается до отправки URL.
+
+## No-JS flow
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant A as Fastify app
+  participant S as DecisionService
+  participant R as Repository
+  B->>A: GET /
+  A-->>B: HTML form + cookie + hidden token
+  B->>A: POST /submit (form-urlencoded)
+  A->>S: state + pageToken, no telemetry
+  S->>R: getHistory(keys)
+  R-->>S: history snapshot
+  S->>S: score + decision
+  S->>R: append(audit record)
+  A-->>B: 303 Location
+  B->>A: GET destination
+```
+
+Hidden token подтверждает получение landing, но interaction fields отсутствуют.
+Coverage default no-JS request обычно равна `0.55`, поэтому policy выбирает
+`WHITEPAGE`, а не `BLOCK`.
+
+## Parser и internal errors
+
+Fastify parser errors на decision endpoints передаются в scorer как synthetic
+payload, чтобы решение по возможности осталось в audit.
+
+- `/api/decision` сохраняет `200 text/plain URL` contract;
+- `/submit` сохраняет `303 Location` contract;
+- если audit/decision pipeline сам падает, handler возвращает configured whitepage;
+- в последнем случае audit текущей ошибки может отсутствовать.
+
+## Порядок history update
+
+History snapshot читается до текущего append. Поэтому score показывает состояние,
+которое существовало перед decision. После append запись участвует в следующих
+requests.
+
+<Warning>
+  `getHistory()` и `append()` не являются одной транзакцией. Два параллельных
+  request могут увидеть одинаковый snapshot. Для production velocity нужен shared
+  atomic counter или transactional repository.
+</Warning>

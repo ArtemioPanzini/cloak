@@ -40,6 +40,18 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Интеграция",
+        "icon": "plug",
+        "pages": [
+          "integrator/quickstart",
+          "integrator/configuration",
+          "integrator/request-lifecycle",
+          "integrator/audit-log",
+          "integrator/privacy-and-security",
+          "integrator/troubleshooting"
+        ]
       }
     ]
   }

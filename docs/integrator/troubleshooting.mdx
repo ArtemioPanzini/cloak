@@ -1,0 +1,116 @@
+---
+title: "Диагностика"
+description: "Порты, secrets, cookies, proxy, storage и неожиданные decisions."
+---
+
+## Сервер не запускается
+
+### Port already in use
+
+```bash
+ss -ltnp | grep ':3000'
+```
+
+Измените `PORT` или остановите процесс. Mintlify preview специально использует
+`3333`.
+
+### Config validation error
+
+Проверьте:
+
+- secrets не короче 24 символов;
+- URLs имеют `http://` или `https://`;
+- `PORT`, TTL и body size находятся в разрешённых диапазонах;
+- boolean использует `true/false`, `yes/no`, `on/off` или `1/0`.
+
+## Всегда приходит whitepage
+
+Посмотрите последнюю decision:
+
+```bash
+npm run audit:tail -- 1
+```
+
+Типовые причины:
+
+| Reason | Что проверить |
+|---|---|
+| `INSUFFICIENT_SIGNAL_COVERAGE` | Загружен ли `telemetry.js`, не сработал ли native fallback |
+| `ELEVATED_AUTOMATION_RISK` | Token status, dwell, UA, event order, device anomalies |
+| `LOW_INTENT` | Dropdown change, active input и timing |
+| `INVALID_STATE` | Передаётся ли US state code |
+
+No-JS whitepage — ожидаемое поведение, а не ошибка.
+
+## Cookie не сохраняется
+
+- На HTTP localhost оставьте `COOKIE_SECURE=false`.
+- За HTTPS установите `COOKIE_SECURE=true`.
+- Проверьте domain/path proxy rewriting.
+- Не передавайте client-supplied cookie как trusted visitor identity: signature
+  проверяется server-side.
+
+## Неверный IP или enrichment
+
+Default `TRUST_PROXY=false`, поэтому Fastify использует socket IP.
+
+Перед включением `TRUST_PROXY=true` настройте доверенную proxy chain. Перед
+`TRUST_ENRICHMENT_HEADERS=true` proxy должен удалить входящие `x-geo-region` и
+`x-network-type` и записать проверенные значения.
+
+## Audit file отсутствует
+
+До первой decision это нормально:
+
+```bash
+npm run audit:tail
+```
+
+Если decision была:
+
+```bash
+ls -ld data
+ls -l data/audit.jsonl
+```
+
+Проверьте working directory, `DATA_FILE` и write permissions. Ошибка storage
+приводит к fail-safe whitepage, но текущая запись может отсутствовать.
+
+## Malformed JSON не возвращает HTTP 400
+
+Это намеренный внешний контракт decision endpoints. Parser error превращается в
+synthetic suspicious input; клиент получает destination URL или redirect, а
+детали остаются в audit/log.
+
+## Invalid token всё ещё получил offer
+
+Текущая policy даёт malformed/future/invalid signature token `+35` risk, а
+whitepage threshold равен `40`. Согласованные остальные signals могут оставить
+итог ниже threshold. Это документированное behavior текущей версии.
+
+## Mintlify не запускается
+
+```bash
+npm ci
+npm run docs:validate
+npm run docs:dev
+```
+
+Убедитесь, что `3333` свободен и команда запускается из корня repository. Script
+сам переходит в `docs/`, где находится `docs.json`.
+
+## Минимальный diagnostic bundle
+
+Перед investigation сохраните без secrets:
+
+```bash
+node --version
+npm --version
+npm test
+npm run typecheck
+npm run build
+npm run docs:validate
+npm run audit:tail -- 5
+```
+
+Не публикуйте `.env`, raw audit records или HMAC secrets.

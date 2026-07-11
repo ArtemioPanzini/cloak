@@ -1,0 +1,93 @@
+---
+title: "Конфигурация"
+description: "Environment variables, defaults, ограничения и trust boundaries."
+---
+
+Конфигурация читается через `dotenv` и проверяется Zod при старте. Некорректное
+значение останавливает процесс до открытия HTTP-порта.
+
+## HTTP и URL
+
+| Variable | Type/default | Назначение | Примечание |
+|---|---|---|---|
+| `PORT` | integer, `3000` | HTTP port | Диапазон `1..65535` |
+| `HOST` | string, `0.0.0.0` | Bind address | Для локального-only bind используйте `127.0.0.1` |
+| `PUBLIC_BASE_URL` | URL, `http://localhost:$PORT` | База demo destinations | Финальный `/` удаляется |
+| `OFFER_URL` | URL, `$PUBLIC_BASE_URL/demo/offer` | Destination для `OFFER` | Никогда не берётся из request body |
+| `WHITEPAGE_URL` | URL, `$PUBLIC_BASE_URL/demo/whitepage` | Destination для fallback | Используется fail-safe handler-ом |
+| `BLOCK_URL` | URL, `$PUBLIC_BASE_URL/demo/blocked` | Destination для `BLOCK` | Demo route отвечает HTTP 403 только после navigation |
+
+## Secrets и identity
+
+| Variable | Type/default | Назначение | Примечание |
+|---|---|---|---|
+| `PAGE_TOKEN_SECRET` | string ≥24, dev value | HMAC page token | Заменить вне local development |
+| `HASH_SECRET` | string ≥24, dev value | HMAC visitor/fingerprint/IP/token keys | Rotation разрывает history continuity |
+| `COOKIE_SECRET` | string ≥24, dev value | Signed `prelander_visit` cookie | Заменить вне local development |
+| `PAGE_TOKEN_TTL_MS` | integer, `600000` | Token TTL | `30000..86400000` ms |
+
+Secrets выполняют разные функции и не должны использовать одно значение.
+
+## Storage
+
+| Variable | Type/default | Назначение | Примечание |
+|---|---|---|---|
+| `DATA_FILE` | string, `./data/audit.jsonl` | JSONL audit/history | Parent directory создаётся автоматически |
+
+Путь разрешается относительно working directory процесса. Запускайте команды из
+корня repository или задавайте абсолютный путь.
+
+## Proxy и enrichment
+
+| Variable | Type/default | Назначение | Trust boundary |
+|---|---|---|---|
+| `TRUST_PROXY` | boolean, `false` | Разрешить Fastify определять IP через proxy chain | Включать только за контролируемым proxy |
+| `TRUST_ENRICHMENT_HEADERS` | boolean, `false` | Читать `x-geo-region` и `x-network-type` | Proxy обязан удалить client-supplied values |
+
+Boolean принимает `1/0`, `true/false`, `yes/no`, `on/off` без учёта регистра.
+
+Поддерживаемые network values: `residential`, `vpn`, `proxy`, `hosting`; остальные
+нормализуются в `unknown`.
+
+## Cookie и transport
+
+| Variable | Type/default | Назначение | Примечание |
+|---|---|---|---|
+| `COOKIE_SECURE` | boolean, `false` | Установить cookie flag `Secure` | Для HTTPS production должен быть `true`; на HTTP localhost secure cookie не вернётся |
+| `MAX_BODY_BYTES` | integer, `65536` | Fastify body limit | Диапазон `1024..1048576` |
+
+Visitor cookie дополнительно использует `HttpOnly`, `SameSite=Lax`, path `/` и
+30-дневный `Max-Age`.
+
+## Logging
+
+| Variable | Type/default | Назначение | Значения |
+|---|---|---|---|
+| `LOG_LEVEL` | enum, `info` | Fastify/Pino logging | `fatal`, `error`, `warn`, `info`, `debug`, `trace`, `silent` |
+
+Application log содержит decision summary, но полный raw input и adjustments
+находятся в JSONL audit.
+
+## Минимальный внешний `.env`
+
+```dotenv
+PORT=3000
+HOST=0.0.0.0
+PUBLIC_BASE_URL=https://prelander.example
+PAGE_TOKEN_SECRET=replace-with-a-random-secret-at-least-24-chars
+HASH_SECRET=replace-with-a-different-random-secret
+COOKIE_SECRET=replace-with-another-random-secret
+DATA_FILE=/var/lib/prelander/audit.jsonl
+OFFER_URL=https://offer.example/path
+WHITEPAGE_URL=https://www.example.com/info
+BLOCK_URL=https://www.example.com/unavailable
+COOKIE_SECURE=true
+TRUST_PROXY=true
+TRUST_ENRICHMENT_HEADERS=false
+LOG_LEVEL=info
+```
+
+<Note>
+  Production hardening не входит в текущую реализацию. Этот пример не заменяет
+  HTTPS termination, access control, retention, backups и monitoring.
+</Note>

@@ -401,7 +401,7 @@ git commit -m "docs: add reviewer evaluation guide"
 
 ## Milestone 4: Integrator documentation
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Goal:** Дать точные startup, configuration, lifecycle, audit, privacy и troubleshooting guides.
 
@@ -415,15 +415,15 @@ git commit -m "docs: add reviewer evaluation guide"
 - Create: `docs/integrator/quickstart.mdx`
 - Create: `docs/integrator/configuration.mdx`
 
-- [ ] **Step 1: Write verified quickstart**
+- [x] **Step 1: Write verified quickstart**
 
 Include Node.js 20+, `npm ci`, optional `.env`, `npm run dev`, landing/health URLs, destination replacement, audit path, tests and development-secret warning.
 
-- [ ] **Step 2: Write configuration reference**
+- [x] **Step 2: Write configuration reference**
 
 Document every `.env.example`/`src/config.ts` variable with type, default, purpose, trust boundary and deployment note. Give extra detail to proxy, enrichment, cookie, body-size and destination settings.
 
-- [ ] **Step 3: Verify config completeness**
+- [x] **Step 3: Verify config completeness**
 
 ```bash
 for key in PORT HOST PUBLIC_BASE_URL PAGE_TOKEN_SECRET HASH_SECRET COOKIE_SECRET DATA_FILE OFFER_URL WHITEPAGE_URL BLOCK_URL PAGE_TOKEN_TTL_MS TRUST_PROXY TRUST_ENRICHMENT_HEADERS COOKIE_SECURE LOG_LEVEL MAX_BODY_BYTES; do rg -q "$key" docs/integrator/configuration.mdx || exit 1; done
@@ -436,15 +436,15 @@ npm run docs:validate
 - Create: `docs/integrator/request-lifecycle.mdx`
 - Create: `docs/integrator/audit-log.mdx`
 
-- [ ] **Step 1: Write JS and no-JS lifecycles**
+- [x] **Step 1: Write JS and no-JS lifecycles**
 
 Use separate diagrams including cookie, token, telemetry, normalization, history, scoring, audit, URL navigation and `303` redirect.
 
-- [ ] **Step 2: Write audit guide**
+- [x] **Step 2: Write audit guide**
 
 Document `DATA_FILE`, JSONL record categories, HMAC identifiers, raw body/IP, write chain, history rebuild, `audit:tail`, memory/linear lookup and single-process limits.
 
-- [ ] **Step 3: Verify audit command and docs**
+- [x] **Step 3: Verify audit command and docs**
 
 ```bash
 npm run audit:tail -- 2
@@ -460,15 +460,15 @@ If observed empty-file behavior differs, correct the guide before commit.
 - Create: `docs/integrator/troubleshooting.mdx`
 - Modify: `docs/docs.json`
 
-- [ ] **Step 1: Write data categories and threat model**
+- [x] **Step 1: Write data categories and threat model**
 
 Separate scoring, coverage/history and audit use. Cover untrusted telemetry, signed cookie/token, HMAC, spoofable fingerprint, raw IP, retention, replay, excluded invasive collection and hidden internal reasons.
 
-- [ ] **Step 2: Write troubleshooting tree**
+- [x] **Step 2: Write troubleshooting tree**
 
 Cover ports, secrets, secure cookie, proxy trust, missing telemetry, malformed payload, unwritable storage, unexpected whitepage, audit inspection and docs preview.
 
-- [ ] **Step 3: Add the complete Integration tab**
+- [x] **Step 3: Add the complete Integration tab**
 
 Add tab `Интеграция`, icon `plug`, with pages in this order:
 
@@ -481,7 +481,7 @@ integrator/privacy-and-security
 integrator/troubleshooting
 ```
 
-- [ ] **Step 4: Validate claims**
+- [x] **Step 4: Validate claims**
 
 ```bash
 rg -n 'raw IP|+35|3333|TRUST_ENRICHMENT_HEADERS|COOKIE_SECURE' docs/integrator

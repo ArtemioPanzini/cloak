@@ -1,0 +1,105 @@
+---
+title: "Privacy и security"
+description: "Категории данных, trust boundaries, page token threat model и retention."
+---
+
+Эта реализация демонстрирует scoring design, а не полный privacy/compliance
+framework. До использования на реальном трафике нужны legal review, retention и
+access controls.
+
+## Категории данных
+
+Одно поле может относиться к нескольким категориям.
+
+| Категория | Примеры | Назначение |
+|---|---|---|
+| Scoring | token status, server dwell, webdriver, event order, velocity | Risk/intent adjustments |
+| Coverage | headers, timing presence, interaction fields, device context | Уверенность в наличии evidence |
+| History | HMAC visitor/fingerprint/IP/token keys, timestamps | Repeat, burst и replay |
+| Audit/diagnostics | raw body, normalized signals, raw IP, adjustments | Объяснимость и investigation |
+
+## Client trust boundary
+
+Весь JSON payload недоверенный:
+
+- типы и размеры нормализуются;
+- out-of-range values записываются как issues/anomalies;
+- client timestamps не заменяют server dwell;
+- fingerprint не является идентификацией человека;
+- interaction events можно синтезировать.
+
+Client evidence полезна только в комбинации с server/history evidence.
+
+## Visitor cookie
+
+Cookie содержит random UUID и подписывается `COOKIE_SECRET`.
+
+- `HttpOnly` ограничивает доступ из JavaScript;
+- `SameSite=Lax` уменьшает cross-site отправку;
+- path `/`, lifetime 30 дней;
+- `Secure` управляется `COOKIE_SECURE`.
+
+UUID не записывается напрямую как index key: repository использует HMAC
+`visitorKey`.
+
+## Page token threat model
+
+Token содержит `issuedAtMs` и random nonce, подписанные `PAGE_TOKEN_SECRET`.
+Он защищает от произвольного создания valid token и даёт server-owned dwell.
+
+Token не обеспечивает:
+
+- доказательство человека;
+- привязку nonce к конкретной cookie;
+- строгую одноразовость;
+- защиту от replay до history thresholds;
+- секретность payload — base64url не является encryption.
+
+Текущие deltas:
+
+| Status | Risk |
+|---|---:|
+| valid | `-5` |
+| missing | `+15` |
+| expired | `+5` |
+| malformed/future/invalid signature | `+35` |
+
+Invalid token не является абсолютным запретом `OFFER` в текущей policy.
+
+## HMAC identifiers
+
+Visitor UUID, fingerprint, IP и token nonce преобразуются в deterministic HMAC
+hex с `HASH_SECRET`. Это позволяет lookup без хранения исходного значения в index.
+
+HMAC не делает low-entropy значение анонимным при утечке secret. Rotation secret
+разрывает сопоставимость старой и новой history.
+
+## Что не собирается
+
+- полные mouse coordinates;
+- содержимое keyboard input;
+- canvas/audio fingerprint;
+- список fonts/plugins;
+- browser geolocation;
+- рекламные reviewer signatures;
+- platform-specific crawler IP lists.
+
+## Почему внутренние причины скрыты
+
+Клиент получает только destination URL. Score, reason codes и raw signals:
+
+- раскрывают thresholds и облегчают адаптацию automation;
+- содержат диагностические сведения;
+- не нужны браузеру для navigation.
+
+Полная explainability остаётся в server-side audit.
+
+## Рекомендации перед внешним использованием
+
+- Получить lawful basis/consent для telemetry.
+- Удалить или зашифровать raw IP и минимизировать body/header retention.
+- Ограничить audit отдельной service identity.
+- Использовать managed secrets и rotation.
+- Включить HTTPS и `COOKIE_SECURE=true`.
+- Настроить trusted proxy chain до `TRUST_PROXY=true`.
+- Добавить retention, deletion workflow и incident monitoring.
