@@ -52,6 +52,20 @@
           "integrator/privacy-and-security",
           "integrator/troubleshooting"
         ]
+      },
+      {
+        "tab": "Справочник API",
+        "icon": "square-terminal",
+        "groups": [
+          {
+            "group": "Контракт",
+            "pages": ["api-reference/overview"]
+          },
+          {
+            "group": "Endpoints",
+            "openapi": "api-reference/openapi.yaml"
+          }
+        ]
       }
     ]
   }

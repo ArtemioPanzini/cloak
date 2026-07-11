@@ -1,0 +1,82 @@
+---
+title: "Обзор API"
+description: "URL-only contract, submit flows, page token semantics и fail-safe behavior."
+---
+
+API оптимизирован для browser navigation, а не для передачи scoring details.
+
+## Главный инвариант
+
+```http
+POST /api/decision HTTP/1.1
+Content-Type: application/json
+
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=utf-8
+Cache-Control: no-store
+
+https://destination.example/offer
+```
+
+Endpoint не возвращает JSON и не раскрывает `score`, `reasonCodes`, `decision`
+или входные signals.
+
+## Два submit endpoint
+
+| Endpoint | Flow | Request | Response |
+|---|---|---|---|
+| `POST /api/decision` | JavaScript | JSON state, token, telemetry | `200 text/plain` URL |
+| `POST /submit` | Native no-JS form | form-urlencoded state, token | `303 Location` |
+
+Оба route используют один `DecisionService`, scoring engine и audit repository.
+
+## Page token
+
+Token выдаётся в hidden input ответа `GET /` и передаётся при submit. Он содержит
+server timestamp и random nonce под HMAC signature.
+
+| Status | Risk delta | Coverage |
+|---|---:|---:|
+| Valid | `-5` | `+0.20` |
+| Missing | `+15` | `0` |
+| Expired | `+5` | `+0.10` |
+| Malformed | `+35` | `0` |
+| Future | `+35` | `0` |
+| Invalid signature | `+35` | `0` |
+
+TTL по умолчанию — 10 минут; future skew tolerance — 30 секунд.
+
+<Warning>
+  Token не связан криптографически с visitor cookie и не является строго
+  одноразовым. Invalid token добавляет `+35`, но не создаёт абсолютного запрета
+  `OFFER` при текущем threshold `40`.
+</Warning>
+
+## Cookie lifecycle
+
+`GET /` создаёт signed `prelander_visit`, если request не содержит valid cookie.
+Следующий submit должен отправлять её с `credentials: same-origin`. Без valid
+cookie backend создаёт новую identity, но продолжает scoring request.
+
+## Error behavior
+
+| Ситуация | Внешнее поведение |
+|---|---|
+| Invalid state | Block destination URL |
+| Missing/invalid token | Risk adjustment; итог зависит от остальных evidence |
+| Insufficient coverage | Whitepage URL/redirect |
+| Malformed JSON | Synthetic input, audit и destination URL, когда pipeline доступен |
+| Body/parser error | URL-only/redirect contract сохраняется по возможности |
+| Storage/decision failure | Configured whitepage; текущий audit может отсутствовать |
+
+Decision endpoints намеренно не используют детальные 4xx JSON errors: они не
+должны раскрывать внутреннюю classification model клиенту.
+
+## API playground limitation
+
+Интерактивный request к `/api/decision` без предварительного `GET /` не имеет
+настоящей signed cookie и page token. Он полезен для просмотра schema и fail-safe
+contract, но не воспроизводит normal browser lifecycle или ожидаемый `OFFER`.
+
+Для end-to-end проверки используйте [жизненный цикл запроса](/integrator/request-lifecycle)
+и обычную landing page.

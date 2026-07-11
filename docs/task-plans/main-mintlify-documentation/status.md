@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Milestone 4 complete; Milestone 5 is next.
+Milestone 5 complete; Milestone 6 is next.
 
 ## Baseline
 
@@ -31,8 +31,8 @@ Milestone 4 complete; Milestone 5 is next.
 
 ## Next
 
-1. Execute Milestone 5 from `plans.md`: add HTTP contract assertions, OpenAPI 3.1 and API overview.
-2. Validate the specification against observed Fastify behavior.
+1. Execute Milestone 6 from `plans.md`: synchronize README and landing links.
+2. Run clean-install, application, documentation and dual-server release gates.
 
 ## Decisions
 
@@ -77,8 +77,8 @@ git diff --check
 | 1. Reproducible toolchain | Complete | `build: make docs toolchain reproducible` | `bfd7709` | 19/19 tests; typecheck/build pass; clean install pass; runtime audit 0 |
 | 2. Mintlify shell | Complete | `docs: scaffold Mintlify navigation` | `251a8c2` | `mint validate`; preview HTTP 200 on 3333 |
 | 3. Reviewer docs | Complete | `docs: add reviewer evaluation guide` | `3f0cb8b` | `mint validate`; 11/11 scoring scenarios; path/threshold scans pass |
-| 4. Integrator docs | Complete | `docs: add integration guides` | checkpoint pending | `mint validate`; 16 config keys; audit-tail behavior verified |
-| 5. OpenAPI | Pending | `docs: add OpenAPI contract` | — | Pending |
+| 4. Integrator docs | Complete | `docs: add integration guides` | `1b1ef7d` | `mint validate`; 16 config keys; audit-tail behavior verified |
+| 5. OpenAPI | Complete | `docs: add OpenAPI contract` | checkpoint pending | `mint validate`; 8/8 API and token contract tests; diff check pass |
 | 6. Finalization | Pending | `docs: finalize Mintlify documentation` or no commit | — | Pending |
 
 ## Audit log
@@ -92,6 +92,7 @@ git diff --check
 - `2026-07-11`: Milestone 2 completed; Mintlify config validates and landing preview returned HTTP 200 on port 3333.
 - `2026-07-11`: Milestone 3 completed; eight reviewer pages and complete reviewer navigation validate successfully.
 - `2026-07-11`: Milestone 4 completed; six integrator pages, config coverage and audit behavior validate successfully.
+- `2026-07-11`: Milestone 5 completed; OpenAPI 3.1, API overview and tested HTTP invariants validate successfully.
 
 ## Smoke/demo checks
 
@@ -99,8 +100,8 @@ git diff --check
 |---|---|---|
 | App on port 3000 | Deferred | Execution phase |
 | Mintlify on port 3333 | Pass | Landing preview HTTP 200; process stopped after smoke |
-| Four navigation tabs | Partial | Overview, Solution Review and Integration implemented |
-| OpenAPI pages | Not run | OpenAPI not implemented |
+| Four navigation tabs | Pass | Overview, Solution Review, Integration and API Reference validate |
+| OpenAPI pages | Pass | OpenAPI-backed endpoint group and API overview pass `mint validate` |
 | JS decision flow | Deferred | Final smoke |
 | No-JS redirect flow | Deferred | Final smoke |
 

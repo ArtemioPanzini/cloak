@@ -501,7 +501,7 @@ git commit -m "docs: add integration guides"
 
 ## Milestone 5: OpenAPI and contract verification
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Goal:** Add accurate OpenAPI 3.1 and tests for published HTTP invariants.
 
@@ -514,7 +514,7 @@ git commit -m "docs: add integration guides"
 **Files:**
 - Modify: `tests/app.test.ts`
 
-- [ ] **Step 1: Add health contract test**
+- [x] **Step 1: Add health contract test**
 
 ```ts
 expect(response.statusCode).toBe(200);
@@ -522,7 +522,7 @@ expect(response.headers["content-type"]).toContain("application/json");
 expect(response.json()).toEqual({ status: "ok" });
 ```
 
-- [ ] **Step 2: Strengthen URL-only test**
+- [x] **Step 2: Strengthen URL-only test**
 
 ```ts
 for (const internalKey of ["score", "reason", "decision", "signals"]) {
@@ -530,11 +530,11 @@ for (const internalKey of ["score", "reason", "decision", "signals"]) {
 }
 ```
 
-- [ ] **Step 3: Strengthen no-JS test**
+- [x] **Step 3: Strengthen no-JS test**
 
 Assert `303`, exact `Location`, empty body and `cache-control: no-store`.
 
-- [ ] **Step 4: Run focused tests**
+- [x] **Step 4: Run focused tests**
 
 ```bash
 npm test -- tests/app.test.ts
@@ -547,19 +547,19 @@ If current behavior differs, correct docs expectations rather than runtime scori
 **Files:**
 - Create: `docs/api-reference/openapi.yaml`
 
-- [ ] **Step 1: Define metadata**
+- [x] **Step 1: Define metadata**
 
 Use OpenAPI `3.1.0`, title `Pre-lander Scoring Gate API`, version `1.0.0`, localhost server and URL-only warning.
 
-- [ ] **Step 2: Define exact paths**
+- [x] **Step 2: Define exact paths**
 
 Document `GET /health`, `GET /`, `POST /api/decision`, `POST /submit`. Define JSON/form bodies, `text/html`, `text/plain`, JSON and redirect responses. Telemetry bounds come from `src/telemetry/normalize.ts`.
 
-- [ ] **Step 3: Describe fail-safe behavior**
+- [x] **Step 3: Describe fail-safe behavior**
 
 State that malformed input may still get a destination; internal fields stay hidden; invalid token adds risk without absolute prohibition.
 
-- [ ] **Step 4: Validate OpenAPI file directly**
+- [x] **Step 4: Validate OpenAPI file directly**
 
 ```bash
 npm run docs:validate
@@ -571,19 +571,19 @@ npm run docs:validate
 - Create: `docs/api-reference/overview.mdx`
 - Modify: `docs/docs.json`
 
-- [ ] **Step 1: Document invariants**
+- [x] **Step 1: Document invariants**
 
 Include exact plain-text response, submit comparison, token deltas, TTL/replay, cookie relation, malformed JSON, invalid state and storage limitation.
 
-- [ ] **Step 2: Explain playground limitation**
+- [x] **Step 2: Explain playground limitation**
 
 State that normal decision flow gets token/cookie from `GET /`; an isolated playground call does not reproduce the browser lifecycle.
 
-- [ ] **Step 3: Add the complete API tab**
+- [x] **Step 3: Add the complete API tab**
 
 Add `Справочник API`, icon `square-terminal`, with overview page and an OpenAPI-backed group referencing `api-reference/openapi.yaml`. Do not use standalone reserved label `API`.
 
-- [ ] **Step 4: Run API gates**
+- [x] **Step 4: Run API gates**
 
 ```bash
 npm test -- tests/app.test.ts tests/page-token.test.ts
