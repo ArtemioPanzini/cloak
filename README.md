@@ -1,4 +1,4 @@
-Ссылки на ai-conversations: 
+Ссылки на ai-conversations: !!! Это не просто переписка в чате гпт, это модель гпт про, модель без кеша и стоит 180$ output по бенчмаркам выше всех !!!
 - https://chatgpt.com/c/6a5216f4-31a4-83eb-a01b-cfc99904ed72
 - https://chatgpt.com/share/6a522370-e2c4-83ed-8450-ac2658bdd883
 - https://chatgpt.com/share/6a52237a-1fa0-83ed-b000-57d127a7c5b8
