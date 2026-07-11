@@ -107,3 +107,4 @@ npm run docs:dev
 ## AI conversations
 https://chatgpt.com/share/6a5289fb-a7dc-83eb-9c87-208164445fd9
 https://chatgpt.com/share/6a5289de-9608-83ed-ba4d-a2f82d665af7
+Также был codex 5.6 sol max
