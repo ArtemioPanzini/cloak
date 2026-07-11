@@ -75,7 +75,7 @@ Modify current documentation:
 
 ## Milestone 1: Bound page-token primitive
 
-**Status:** `[ ]`
+**Status:** `[~]` — implementation and targeted tests complete; checkpoint combined with Milestone 2 to avoid committing broken public callers.
 
 **Goal:** Выпускать и проверять versioned token с embedded expiry и binding к visitor ID.
 
@@ -249,7 +249,7 @@ git commit -m "security: bind page tokens to visitor sessions"
 
 ## Milestone 2: Decision, audit and HTTP integration
 
-**Status:** `[ ]`
+**Status:** `[~]` — runtime integration, targeted tests and typecheck complete; checkpoint pending.
 
 **Goal:** Подключить bound token ко всему request pipeline и harden landing response.
 
@@ -576,4 +576,3 @@ git commit -m "docs: record page-token security verification"
 ```
 
 **Definition of done:** Runtime, tests, docs and live HTTP behavior pass all acceptance gates; status contains enough evidence for a fresh reviewer to reproduce them.
-

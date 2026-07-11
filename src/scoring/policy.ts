@@ -16,6 +16,10 @@ export function resolveDecision(
     return { decision: "BLOCK", primaryReason: "MULTI_SIGNAL_AUTOMATION" };
   }
 
+  if (input.server.pageTokenStatus !== "valid") {
+    return { decision: "WHITEPAGE", primaryReason: "VALID_PAGE_TOKEN_REQUIRED" };
+  }
+
   if (score.coverage < 0.6) {
     return { decision: "WHITEPAGE", primaryReason: "INSUFFICIENT_SIGNAL_COVERAGE" };
   }

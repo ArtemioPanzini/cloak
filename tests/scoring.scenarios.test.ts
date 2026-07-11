@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Decision } from "../src/domain/types.js";
+import type { Decision, PageTokenStatus } from "../src/domain/types.js";
 import { resolveDecision } from "../src/scoring/policy.js";
 import { scoreVisitor } from "../src/scoring/scorer.js";
 import { cleanClient, makeHistory, makeInput } from "./fixtures.js";
@@ -161,6 +161,22 @@ describe("scoring scenarios", () => {
     const score = scoreVisitor(input, history);
     const resolution = resolveDecision(input, score);
     expect(resolution.decision).toBe(expected);
+  });
+
+  it.each<PageTokenStatus>([
+    "missing",
+    "malformed",
+    "invalid_signature",
+    "expired",
+    "future",
+    "visitor_mismatch"
+  ])("never returns OFFER when page token status is %s", (pageTokenStatus) => {
+    const input = makeInput({ server: { pageTokenStatus } });
+    const score = scoreVisitor(input, makeHistory());
+    const resolution = resolveDecision(input, score);
+
+    expect(resolution.decision).toBe("WHITEPAGE");
+    expect(resolution.primaryReason).toBe("VALID_PAGE_TOKEN_REQUIRED");
   });
 
   it("requires independent evidence groups for a hard automation block", () => {

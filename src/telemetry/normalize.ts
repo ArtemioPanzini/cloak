@@ -18,6 +18,16 @@ function asRecord(value: unknown): UnknownRecord | undefined {
     : undefined;
 }
 
+export function redactDecisionBody(rawBody: unknown): unknown {
+  const source = asRecord(rawBody);
+  if (!source || !("pageToken" in source)) return rawBody;
+
+  return {
+    ...source,
+    pageToken: "[REDACTED]"
+  };
+}
+
 function readString(
   source: UnknownRecord,
   key: string,
@@ -187,7 +197,7 @@ export function normalizeDecisionPayload(rawBody: unknown): NormalizedPayload {
       state: "",
       validState: false,
       payloadIssues: ["body:not_object"],
-      rawBody
+      rawBody: redactDecisionBody(rawBody)
     };
   }
 
@@ -202,6 +212,6 @@ export function normalizeDecisionPayload(rawBody: unknown): NormalizedPayload {
     ...(pageToken !== undefined ? { pageToken } : {}),
     ...(client !== undefined ? { client } : {}),
     payloadIssues,
-    rawBody
+    rawBody: redactDecisionBody(rawBody)
   };
 }

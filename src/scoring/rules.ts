@@ -151,7 +151,7 @@ const tokenRule: ScoringRule = {
   evaluate({ input }) {
     switch (input.server.pageTokenStatus) {
       case "valid":
-        return adjustment("VALID_PAGE_TOKEN", "token", -5, 0);
+        return adjustment("VALID_PAGE_TOKEN", "token", 0, 0);
       case "missing":
         return adjustment("MISSING_PAGE_TOKEN", "token", 15, 0);
       case "expired":
@@ -162,6 +162,8 @@ const tokenRule: ScoringRule = {
         return adjustment("MALFORMED_PAGE_TOKEN", "token", 35, 0);
       case "invalid_signature":
         return adjustment("INVALID_PAGE_TOKEN_SIGNATURE", "token", 35, 0);
+      case "visitor_mismatch":
+        return adjustment("PAGE_TOKEN_VISITOR_MISMATCH", "token", 35, 0);
     }
   }
 };

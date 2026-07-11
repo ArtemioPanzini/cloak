@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Planning complete; implementation has not started.
+Milestones 1 and 2 are implemented and ready for a combined checkpoint.
 
 ## Baseline
 
@@ -20,15 +20,20 @@ Planning complete; implementation has not started.
 - `[x]` Design spec written, self-reviewed, approved and committed.
 - `[x]` Current docs/OpenAPI contradictions identified.
 - `[x]` Execution and test plan pack created.
+- `[x]` Bound token unit suite implemented with explicit expiry boundary.
+- `[x]` Offer eligibility, trusted timing and visitor mismatch integrated.
+- `[x]` Audit redaction and landing security headers integrated.
+- `[x]` Targeted security suites pass: 32 tests across 3 files.
+- `[x]` Typecheck passes after all public callers were migrated.
 
 ## In progress
 
-- None. Planning-only run is ending before implementation.
+- Combined Milestone 1/2 checkpoint commit.
 
 ## Next
 
-1. Read the approved design spec, `plans.md` and `test-plan.md` completely.
-2. Start Milestone 1: bound page-token primitive using red-green TDD.
+1. Commit the coherent Milestone 1/2 runtime integration.
+2. Start Milestone 3: synchronize current README, Mintlify and OpenAPI content.
 
 ## Decisions
 
@@ -74,8 +79,8 @@ git diff --check
 
 | Milestone | Status | Planned commit | Actual commit | Validation |
 |---|---|---|---|---|
-| 1. Bound token primitive | Pending | `security: bind page tokens to visitor sessions` | — | Not run |
-| 2. Decision/audit/HTTP integration | Pending | `security: enforce page-token offer eligibility` | — | Not run |
+| 1. Bound token primitive | Ready for combined checkpoint | `security: bind page tokens to visitor sessions` | Combined with Milestone 2 | 8/8 unit tests pass; initial typecheck exposed expected unmigrated callers |
+| 2. Decision/audit/HTTP integration | Ready for combined checkpoint | `security: enforce page-token offer eligibility` | Pending | 32 targeted tests and typecheck pass |
 | 3. Documentation synchronization | Pending | `docs: document bound page-token security` | — | Not run |
 | 4. Release verification | Pending | `docs: record page-token security verification` | — | Not run |
 
@@ -87,6 +92,11 @@ git diff --check
 - `2026-07-11`: User approved full current-main integration while preserving historical planning artifacts.
 - `2026-07-11`: Design spec committed as `a7bb8eb` and then approved by user.
 - `2026-07-11`: Task-scoped plan pack created; implementation deliberately not started.
+- `2026-07-11`: Worktree `.worktrees/page-token-security` created on `agent/page-token-security`; baseline 20/20 passed.
+- `2026-07-11`: Token RED produced 7 expected failures; GREEN produced 8/8 passing unit tests.
+- `2026-07-11`: Milestone 1 typecheck correctly exposed six unmigrated public callers. The checkpoint was deferred rather than committing a non-compiling intermediate state.
+- `2026-07-11`: Eligibility RED produced six `OFFER` results; policy GREEN produced 25/25 token/scoring tests.
+- `2026-07-11`: HTTP RED exposed missing issuance/headers and copied-token flow; integration GREEN produced 32/32 targeted tests and a clean typecheck.
 
 ## Smoke/demo checks
 
@@ -103,9 +113,7 @@ git diff --check
 
 ## Resume instructions
 
-1. Read the approved design spec.
-2. Read `plans.md` and `test-plan.md` completely.
-3. Confirm no unrelated worktree changes.
-4. Use `executing-plans` and start Milestone 1 only.
-5. Run targeted checks, update this file and create the checkpoint commit before continuing.
-
+1. Read the approved design spec, `plans.md` and `test-plan.md`.
+2. Confirm the combined runtime checkpoint exists and no unrelated worktree changes appeared.
+3. Start Milestone 3 documentation synchronization.
+4. Run docs and semantic checks, update this file and commit the checkpoint before release verification.

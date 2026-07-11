@@ -90,12 +90,23 @@ export async function buildApp(options: BuildAppOptions = {}) {
   });
 
   app.get("/", async (request, reply) => {
-    getOrCreateVisitor(request, reply);
-    const pageToken = issuePageToken(clock(), config.pageTokenSecret);
+    const visitor = getOrCreateVisitor(request, reply);
+    const pageToken = issuePageToken(
+      clock(),
+      config.pageTokenTtlMs,
+      visitor.id,
+      config.pageTokenSecret,
+      config.hashSecret
+    );
     return reply
-      .header("cache-control", "no-store")
+      .header("cache-control", "private, no-store")
+      .header(
+        "content-security-policy",
+        "default-src 'none'; script-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
+      )
       .header("referrer-policy", "strict-origin-when-cross-origin")
       .header("x-content-type-options", "nosniff")
+      .header("x-frame-options", "DENY")
       .type("text/html; charset=utf-8")
       .send(renderPrelander(pageToken));
   });

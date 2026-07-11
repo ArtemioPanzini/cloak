@@ -44,8 +44,10 @@ export class DecisionService {
     const tokenVerification = verifyPageToken(
       payload.pageToken,
       nowMs,
+      context.visitorId,
+      context.hadValidVisitCookie,
       this.config.pageTokenSecret,
-      this.config.pageTokenTtlMs
+      this.config.hashSecret
     );
     const server = buildServerSignals({
       headers: context.headers,

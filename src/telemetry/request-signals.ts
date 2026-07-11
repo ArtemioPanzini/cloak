@@ -41,7 +41,8 @@ export interface RequestSignalOptions {
 
 export function buildServerSignals(options: RequestSignalOptions): ServerSignals {
   const { headers, ip, nowMs, hadValidVisitCookie, tokenVerification, config } = options;
-  const tokenIssuedAt = tokenVerification.payload?.issuedAtMs;
+  const tokenIssuedAt =
+    tokenVerification.status === "valid" ? tokenVerification.payload?.iat : undefined;
   const serverDwellMs =
     tokenIssuedAt !== undefined && tokenIssuedAt <= nowMs
       ? Math.max(0, nowMs - tokenIssuedAt)
@@ -63,8 +64,8 @@ export function buildServerSignals(options: RequestSignalOptions): ServerSignals
   const networkType = config.trustEnrichmentHeaders
     ? parseNetworkType(headerValue(headers, "x-network-type"))
     : "unknown";
-  const pageTokenNonceHash = tokenVerification.payload?.nonce
-    ? hmacHex(config.hashSecret, `token:${tokenVerification.payload.nonce}`)
+  const pageTokenNonceHash = tokenVerification.payload?.jti
+    ? hmacHex(config.hashSecret, `token:${tokenVerification.payload.jti}`)
     : undefined;
 
   return {

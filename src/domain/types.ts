@@ -17,7 +17,8 @@ export type PageTokenStatus =
   | "malformed"
   | "invalid_signature"
   | "expired"
-  | "future";
+  | "future"
+  | "visitor_mismatch";
 
 export type NetworkType = "residential" | "vpn" | "proxy" | "hosting" | "unknown";
 

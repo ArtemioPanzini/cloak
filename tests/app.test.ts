@@ -37,6 +37,31 @@ function extractCookie(setCookie: string | string[] | undefined): string {
   return header.split(";", 1)[0] ?? "";
 }
 
+function convincingTelemetry() {
+  return {
+    pageVisibleMs: 1_750,
+    firstInteractionMs: 500,
+    stateChangedMs: 1_100,
+    submittedMs: 1_800,
+    pointerMoves: 5,
+    pointerDowns: 2,
+    touchStarts: 0,
+    keyDowns: 0,
+    stateChanges: 1,
+    focusCount: 1,
+    blurCount: 0,
+    visibilityChanges: 0,
+    webdriver: false,
+    timezone: "America/Los_Angeles",
+    languages: ["en-US", "en"],
+    screen: { width: 1440, height: 900, colorDepth: 24 },
+    hardwareConcurrency: 8,
+    deviceMemory: 8,
+    maxTouchPoints: 0,
+    fingerprintId: "0123456789abcdef0123456789abcdef"
+  };
+}
+
 const apps: Array<Awaited<ReturnType<typeof buildApp>>["app"]> = [];
 
 afterEach(async () => {
@@ -71,6 +96,9 @@ describe("HTTP application", () => {
     apps.push(built.app);
 
     const landing = await built.app.inject({ method: "GET", url: "/" });
+    expect(landing.headers["cache-control"]).toBe("private, no-store");
+    expect(landing.headers["content-security-policy"]).toContain("form-action 'self'");
+    expect(landing.headers["x-frame-options"]).toBe("DENY");
     const pageToken = extractToken(landing.body);
     const cookie = extractCookie(landing.headers["set-cookie"]);
     nowMs += 1_800;
@@ -89,28 +117,7 @@ describe("HTTP application", () => {
       payload: {
         state: "CA",
         pageToken,
-        telemetry: {
-          pageVisibleMs: 1_750,
-          firstInteractionMs: 500,
-          stateChangedMs: 1_100,
-          submittedMs: 1_800,
-          pointerMoves: 5,
-          pointerDowns: 2,
-          touchStarts: 0,
-          keyDowns: 0,
-          stateChanges: 1,
-          focusCount: 1,
-          blurCount: 0,
-          visibilityChanges: 0,
-          webdriver: false,
-          timezone: "America/Los_Angeles",
-          languages: ["en-US", "en"],
-          screen: { width: 1440, height: 900, colorDepth: 24 },
-          hardwareConcurrency: 8,
-          deviceMemory: 8,
-          maxTouchPoints: 0,
-          fingerprintId: "0123456789abcdef0123456789abcdef"
-        }
+        telemetry: convincingTelemetry()
       }
     });
 
@@ -126,7 +133,78 @@ describe("HTTP application", () => {
     expect(records[0]?.decision).toBe("OFFER");
     expect(records[0]?.incoming.normalized.form.state).toBe("CA");
     expect(records[0]?.score.reasonCodes).toContain("VALID_PAGE_TOKEN");
-    expect(records[0]?.incoming.rawBody).toMatchObject({ state: "CA" });
+    expect(records[0]?.incoming.rawBody).toMatchObject({
+      state: "CA",
+      pageToken: "[REDACTED]"
+    });
+    expect(JSON.stringify(records[0]?.incoming.rawBody)).not.toContain(pageToken);
+  });
+
+  it("does not return OFFER for a direct POST without a page token", async () => {
+    const repository = new JsonlDecisionRepository(":memory:");
+    const built = await buildApp({
+      config: testConfig(),
+      repository,
+      logger: false
+    });
+    apps.push(built.app);
+
+    const response = await built.app.inject({
+      method: "POST",
+      url: "/api/decision",
+      headers: {
+        "content-type": "application/json",
+        accept: "text/plain,application/json",
+        "accept-language": "en-US,en;q=0.9",
+        "user-agent": "Mozilla/5.0 Chrome/124.0.0.0 Safari/537.36"
+      },
+      payload: {
+        state: "CA",
+        telemetry: convincingTelemetry()
+      }
+    });
+
+    expect(response.body).toBe(built.config.whitepageUrl);
+    const records = await repository.getAll();
+    expect(records).toHaveLength(1);
+    expect(records[0]?.incoming.normalized.server.pageTokenStatus).toBe("missing");
+    expect(records[0]?.primaryReason).toBe("VALID_PAGE_TOKEN_REQUIRED");
+  });
+
+  it("does not accept a page token copied to another visitor session", async () => {
+    let nowMs = 1_700_000_070_000;
+    const built = await buildApp({
+      config: testConfig(),
+      repository: new JsonlDecisionRepository(":memory:"),
+      clock: () => nowMs,
+      logger: false
+    });
+    apps.push(built.app);
+
+    const firstLanding = await built.app.inject({ method: "GET", url: "/" });
+    const copiedToken = extractToken(firstLanding.body);
+    const secondLanding = await built.app.inject({ method: "GET", url: "/" });
+    const secondVisitorCookie = extractCookie(secondLanding.headers["set-cookie"]);
+    nowMs += 1_800;
+
+    const response = await built.app.inject({
+      method: "POST",
+      url: "/api/decision",
+      headers: {
+        cookie: secondVisitorCookie,
+        "content-type": "application/json",
+        accept: "text/plain,application/json",
+        "accept-language": "en-US,en;q=0.9",
+        "user-agent": "Mozilla/5.0 Chrome/124.0.0.0 Safari/537.36"
+      },
+      payload: {
+        state: "CA",
+        pageToken: copiedToken,
+        telemetry: convincingTelemetry()
+      }
+    });
+
+    expect(response.body).toBe(built.config.whitepageUrl);
   });
 
   it("supports a no-JS form POST and redirects to the whitepage", async () => {
