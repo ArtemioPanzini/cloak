@@ -101,3 +101,9 @@ npm run docs:dev
 - JSONL не рассчитан на multi-process writes и долгий retention;
 - page token не имеет atomic one-time claim, idempotent retries и key rotation;
 - runtime policy versioning, shadow mode и cohorts пока не реализованы.
+
+
+
+## AI conversations
+https://chatgpt.com/share/6a5289fb-a7dc-83eb-9c87-208164445fd9
+https://chatgpt.com/share/6a5289de-9608-83ed-ba4d-a2f82d665af7
