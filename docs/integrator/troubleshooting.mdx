@@ -35,6 +35,7 @@ npm run audit:tail -- 1
 
 | Reason | Что проверить |
 |---|---|
+| `VALID_PAGE_TOKEN_REQUIRED` | Был ли `GET /`, сохранилась ли signed cookie, не истёк и не скопирован ли token |
 | `INSUFFICIENT_SIGNAL_COVERAGE` | Загружен ли `telemetry.js`, не сработал ли native fallback |
 | `ELEVATED_AUTOMATION_RISK` | Token status, dwell, UA, event order, device anomalies |
 | `LOW_INTENT` | Dropdown change, active input и timing |
@@ -82,11 +83,18 @@ ls -l data/audit.jsonl
 synthetic suspicious input; клиент получает destination URL или redirect, а
 детали остаются в audit/log.
 
-## Invalid token всё ещё получил offer
+## Всегда `VALID_PAGE_TOKEN_REQUIRED`
 
-Текущая policy даёт malformed/future/invalid signature token `+35` risk, а
-whitepage threshold равен `40`. Согласованные остальные signals могут оставить
-итог ниже threshold. Это документированное behavior текущей версии.
+`OFFER` требует valid token из `GET /` и ту же signed visitor cookie. Проверьте:
+
+- browser отправляет cookie (`credentials: same-origin` в JS flow);
+- proxy не удаляет `Cookie` и не переписывает cookie path/domain;
+- `PAGE_TOKEN_TTL_MS` не истёк между landing и submit;
+- token не скопирован в другую visitor session;
+- `HASH_SECRET` не менялся между issuance и verification.
+
+Direct API calls без landing намеренно получают whitepage. Для диагностики
+используйте `pageTokenStatus` в server-side audit; raw token там redacted.
 
 ## Mintlify не запускается
 

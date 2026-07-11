@@ -38,7 +38,8 @@ paths:
       summary: Получить pre-lander
       description: |
         Возвращает минимальную HTML-форму, hidden signed page token и signed
-        visitor cookie. Cookie создаётся только при отсутствии валидной cookie.
+        visitor cookie. Token имеет embedded expiry и binding к этой visitor
+        session. Cookie создаётся только при отсутствии валидной cookie.
       responses:
         "200":
           description: HTML pre-lander со списком штатов.
@@ -50,7 +51,15 @@ paths:
             Cache-Control:
               schema:
                 type: string
-                const: no-store
+                const: private, no-store
+            Content-Security-Policy:
+              description: Разрешает только same-origin script, connect и form flow.
+              schema:
+                type: string
+            X-Frame-Options:
+              schema:
+                type: string
+                const: DENY
           content:
             text/html:
               schema:
@@ -63,9 +72,9 @@ paths:
       summary: Получить destination URL
       description: |
         JavaScript flow. Сервер нормализует недоверенный payload, проверяет
-        page token, загружает history, рассчитывает score и пишет audit до
-        отправки ответа. Invalid token добавляет risk, но сам по себе не создаёт
-        абсолютного запрета `OFFER` в текущей policy.
+        page token и его visitor binding, загружает history, рассчитывает score и
+        пишет audit до отправки ответа. Без fully valid token `OFFER` недоступен;
+        более сильные block branches сохраняют приоритет.
       requestBody:
         required: true
         content:
@@ -168,7 +177,7 @@ components:
         pageToken:
           type: string
           maxLength: 4096
-          description: Token из hidden input ответа `GET /`.
+          description: Token из hidden input ответа `GET /`; для OFFER нужна та же signed visitor cookie.
         telemetry:
           $ref: "#/components/schemas/ClientTelemetry"
     FormDecisionRequest:
@@ -180,6 +189,7 @@ components:
         pageToken:
           type: string
           maxLength: 4096
+          description: Token из hidden input ответа `GET /`, связанный с текущей visitor cookie.
     StateCode:
       type: string
       minLength: 2

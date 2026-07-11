@@ -35,7 +35,15 @@ VPN добавляет только `+5`. Geo mismatch записывается 
 ## No-JS
 
 Server-rendered форма содержит hidden page token, поэтому native submit остаётся
-доступным. Без telemetry coverage ниже `0.60`, и система выбирает whitepage.
+доступным. Token проверяется с той же signed cookie, но без telemetry coverage
+ниже `0.60`, и система выбирает whitepage.
+
+## Token eligibility
+
+Direct POST без token и token, скопированный в другую visitor session, не могут
+получить `OFFER`: policy возвращает `WHITEPAGE` с reason
+`VALID_PAGE_TOKEN_REQUIRED`. Invalid state, extreme burst и multi-group
+automation по-прежнему могут дать более сильный `BLOCK` до eligibility check.
 
 ## Repeat и velocity
 

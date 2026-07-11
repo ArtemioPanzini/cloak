@@ -75,7 +75,7 @@ Modify current documentation:
 
 ## Milestone 1: Bound page-token primitive
 
-**Status:** `[~]` — implementation and targeted tests complete; checkpoint combined with Milestone 2 to avoid committing broken public callers.
+**Status:** `[x]` — implemented and committed with Milestone 2 as `5ad80a9`.
 
 **Goal:** Выпускать и проверять versioned token с embedded expiry и binding к visitor ID.
 
@@ -249,7 +249,7 @@ git commit -m "security: bind page tokens to visitor sessions"
 
 ## Milestone 2: Decision, audit and HTTP integration
 
-**Status:** `[~]` — runtime integration, targeted tests and typecheck complete; checkpoint pending.
+**Status:** `[x]` — implemented and committed as `5ad80a9`.
 
 **Goal:** Подключить bound token ко всему request pipeline и harden landing response.
 
@@ -431,7 +431,7 @@ Expected after Milestone 2: 4 files and 33 tests pass when the full suite is run
 
 ## Milestone 3: Current documentation synchronization
 
-**Status:** `[ ]`
+**Status:** `[~]` — current docs, OpenAPI and patch notes validate; checkpoint pending.
 
 **Goal:** Сделать README, Mintlify и OpenAPI точным отражением новой runtime policy.
 

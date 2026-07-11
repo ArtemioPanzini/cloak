@@ -56,9 +56,12 @@ I/O остаётся снаружи:
 
 ## Server-issued evidence
 
-Page token содержит `issuedAtMs` и случайный nonce, подписанные HMAC-SHA256.
-Backend проверяет signature, TTL и future skew, а затем рассчитывает server dwell
-без доверия к client timestamps.
+Page token содержит version, random `jti`, `iat`, embedded `exp` и visitor
+`binding`. Payload подписан HMAC-SHA256 через `PAGE_TOKEN_SECRET`, а binding
+вычислен domain-separated HMAC через `HASH_SECRET` для visitor ID и `jti`.
+Backend проверяет signature, future skew, expiry и binding к текущей signed cookie.
+Server dwell рассчитывается только после полной проверки token и не доверяет
+client timestamps.
 
 Signed visitor cookie даёт устойчивую identity для repeat/velocity history.
 Fingerprint остаётся слабым дополнительным identifier и также HMAC-хешируется

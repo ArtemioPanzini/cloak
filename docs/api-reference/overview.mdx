@@ -33,37 +33,41 @@ Endpoint не возвращает JSON и не раскрывает `score`, `r
 ## Page token
 
 Token выдаётся в hidden input ответа `GET /` и передаётся при submit. Он содержит
-server timestamp и random nonce под HMAC signature.
+`v`, random `jti`, `iat`, embedded `exp` и HMAC visitor `binding`. Signature
+проверяется через `PAGE_TOKEN_SECRET`, а binding пересчитывается через
+`HASH_SECRET` для текущей signed visitor cookie.
 
 | Status | Risk delta | Coverage |
 |---|---:|---:|
-| Valid | `-5` | `+0.20` |
+| Valid | `0` | `+0.20` |
 | Missing | `+15` | `0` |
 | Expired | `+5` | `+0.10` |
 | Malformed | `+35` | `0` |
 | Future | `+35` | `0` |
 | Invalid signature | `+35` | `0` |
+| Visitor mismatch | `+35` | `0` |
 
 TTL по умолчанию — 10 минут; future skew tolerance — 30 секунд.
 
 <Warning>
-  Token не связан криптографически с visitor cookie и не является строго
-  одноразовым. Invalid token добавляет `+35`, но не создаёт абсолютного запрета
-  `OFFER` при текущем threshold `40`.
+  Token связан с visitor cookie, но не является строго одноразовым и не доказывает
+  человека. Любой non-valid status запрещает `OFFER`; atomic replay claim и
+  idempotent retries остаются production work.
 </Warning>
 
 ## Cookie lifecycle
 
 `GET /` создаёт signed `prelander_visit`, если request не содержит valid cookie.
 Следующий submit должен отправлять её с `credentials: same-origin`. Без valid
-cookie backend создаёт новую identity, но продолжает scoring request.
+cookie backend создаёт новую identity, но token получает `visitor_mismatch` и
+request не проходит `OFFER` eligibility.
 
 ## Error behavior
 
 | Ситуация | Внешнее поведение |
 |---|---|
 | Invalid state | Block destination URL |
-| Missing/invalid token | Risk adjustment; итог зависит от остальных evidence |
+| Missing/invalid token | Whitepage URL/redirect, если более сильный block branch не сработал |
 | Insufficient coverage | Whitepage URL/redirect |
 | Malformed JSON | Synthetic input, audit и destination URL, когда pipeline доступен |
 | Body/parser error | URL-only/redirect contract сохраняется по возможности |

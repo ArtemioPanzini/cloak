@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Milestones 1 and 2 are implemented and ready for a combined checkpoint.
+Milestone 3 documentation synchronization is ready for checkpoint.
 
 ## Baseline
 
@@ -25,15 +25,18 @@ Milestones 1 and 2 are implemented and ready for a combined checkpoint.
 - `[x]` Audit redaction and landing security headers integrated.
 - `[x]` Targeted security suites pass: 32 tests across 3 files.
 - `[x]` Typecheck passes after all public callers were migrated.
+- `[x]` Runtime integration committed as `5ad80a9`.
+- `[x]` README, Mintlify, OpenAPI and patch notes synchronized.
+- `[x]` Mintlify validation and current-doc semantic scans pass.
 
 ## In progress
 
-- Combined Milestone 1/2 checkpoint commit.
+- Milestone 3 documentation checkpoint commit.
 
 ## Next
 
-1. Commit the coherent Milestone 1/2 runtime integration.
-2. Start Milestone 3: synchronize current README, Mintlify and OpenAPI content.
+1. Commit the Milestone 3 documentation synchronization.
+2. Start Milestone 4 full release verification and live smoke.
 
 ## Decisions
 
@@ -79,9 +82,9 @@ git diff --check
 
 | Milestone | Status | Planned commit | Actual commit | Validation |
 |---|---|---|---|---|
-| 1. Bound token primitive | Ready for combined checkpoint | `security: bind page tokens to visitor sessions` | Combined with Milestone 2 | 8/8 unit tests pass; initial typecheck exposed expected unmigrated callers |
-| 2. Decision/audit/HTTP integration | Ready for combined checkpoint | `security: enforce page-token offer eligibility` | Pending | 32 targeted tests and typecheck pass |
-| 3. Documentation synchronization | Pending | `docs: document bound page-token security` | — | Not run |
+| 1. Bound token primitive | Complete | `security: bind page tokens to visitor sessions` | `5ad80a9` combined with Milestone 2 | 8/8 unit tests pass; initial typecheck exposed expected unmigrated callers |
+| 2. Decision/audit/HTTP integration | Complete | `security: enforce page-token offer eligibility` | `5ad80a9` | 33/33 full tests; typecheck and diff check pass |
+| 3. Documentation synchronization | Ready for checkpoint | `docs: document bound page-token security` | Pending | Mintlify validation and semantic scans pass |
 | 4. Release verification | Pending | `docs: record page-token security verification` | — | Not run |
 
 ## Audit log
@@ -97,6 +100,8 @@ git diff --check
 - `2026-07-11`: Milestone 1 typecheck correctly exposed six unmigrated public callers. The checkpoint was deferred rather than committing a non-compiling intermediate state.
 - `2026-07-11`: Eligibility RED produced six `OFFER` results; policy GREEN produced 25/25 token/scoring tests.
 - `2026-07-11`: HTTP RED exposed missing issuance/headers and copied-token flow; integration GREEN produced 32/32 targeted tests and a clean typecheck.
+- `2026-07-11`: Combined runtime checkpoint `5ad80a9` created after 33/33 full tests passed.
+- `2026-07-11`: Current README, Mintlify pages, OpenAPI and `PATCH_NOTES.md` synchronized; structural validation and obsolete-claim scans passed.
 
 ## Smoke/demo checks
 
@@ -113,7 +118,7 @@ git diff --check
 
 ## Resume instructions
 
-1. Read the approved design spec, `plans.md` and `test-plan.md`.
-2. Confirm the combined runtime checkpoint exists and no unrelated worktree changes appeared.
-3. Start Milestone 3 documentation synchronization.
-4. Run docs and semantic checks, update this file and commit the checkpoint before release verification.
+1. Confirm the Milestone 3 docs checkpoint exists and the worktree is otherwise clean.
+2. Run Milestone 4 automated release gates and focused security regressions.
+3. Smoke the built app and record exact dependency audit results.
+4. Update this file and commit the verification record.

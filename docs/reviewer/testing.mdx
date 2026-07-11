@@ -3,7 +3,7 @@ title: "Тестирование"
 description: "Обязательные scoring-сценарии, HTTP contract, token и repository coverage."
 ---
 
-Baseline содержит 20 уникальных тестов в четырёх source test files. Production
+Baseline содержит 33 уникальных теста в четырёх source test files. Production
 build не компилирует `tests/`, а Vitest исключает `**/dist/**` и вложенные
 `**/.worktrees/**`, поэтому один тест не запускается повторно из generated output
 или изолированного worktree.
@@ -12,9 +12,9 @@ build не компилирует `tests/`, а Vitest исключает `**/dis
 
 | Suite | Проверяет |
 |---|---|
-| `scoring.scenarios.test.ts` | 10 table-driven decisions и independent-group policy |
-| `app.test.ts` | URL-only response, no-JS redirect, malformed JSON audit, invalid state |
-| `page-token.test.ts` | Valid signature, tampering и expiration |
+| `scoring.scenarios.test.ts` | 10 decision scenarios, independent-group policy и 6 token eligibility statuses |
+| `app.test.ts` | URL-only/no-JS contracts, binding, headers, redaction, malformed JSON и invalid state |
+| `page-token.test.ts` | Same-session validity, tampering, expiry/future boundaries, malformed/oversized input и binding |
 | `repository.test.ts` | JSONL persistence и history rebuild после restart |
 
 ## Обязательные сценарии
@@ -39,11 +39,12 @@ Fastify `inject()` проверяет реальный route/service/repository 
 сетевого порта:
 
 - landing выдаёт page token и signed cookie;
+- direct POST и token из другой visitor session не получают offer;
 - decision endpoint отвечает только configured URL;
 - score/reason не появляются в body;
 - native form получает `303 Location`;
 - malformed JSON превращается в synthetic audit input;
-- audit содержит raw body, normalized signals и score.
+- audit содержит redacted raw body, normalized signals и score.
 
 ## Как запустить
 

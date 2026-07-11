@@ -57,7 +57,7 @@ BLOCK_URL=https://example.com/blocked
 
 | Endpoint | Ответ |
 |---|---|
-| `GET /` | `200 text/html` — форма и signed page token |
+| `GET /` | `200 text/html` — форма и page token, привязанный к signed visitor cookie |
 | `POST /api/decision` | `200 text/plain` — только destination URL |
 | `POST /submit` | `303 Location` — no-JS fallback |
 | `GET /health` | `200 application/json` |
@@ -66,7 +66,7 @@ Score, причины и сигналы клиенту не возвращают
 
 ## Как принимается решение
 
-Rule engine рассчитывает `automationRisk`, `intentScore` и `coverage`. Отсутствующие данные уменьшают coverage, но сами по себе не доказывают автоматизацию. VPN, нулевая мышь, медленный mobile submit и обычный repeat visit не являются самостоятельными причинами `BLOCK`.
+Rule engine рассчитывает `automationRisk`, `intentScore` и `coverage`. Valid page token обязателен для `OFFER`, но не считается доказательством человека. Отсутствующие данные уменьшают coverage, а VPN, нулевая мышь, медленный mobile submit и обычный repeat visit не являются самостоятельными причинами `BLOCK`.
 
 ```text
 normalize payload → verify token → load history → score → audit → URL/redirect
@@ -81,7 +81,7 @@ npm run audit:tail
 npm run audit:tail -- 25
 ```
 
-History indexes используют HMAC identifiers, но diagnostic payload текущей версии также хранит raw server IP. Перед внешним использованием нужны минимизация данных, encryption/retention policy и более надёжное storage.
+History indexes используют HMAC identifiers. Новый audit заменяет top-level `pageToken` на `[REDACTED]`, но diagnostic payload текущей версии всё ещё хранит raw server IP. Перед внешним использованием нужны минимизация данных, encryption/retention policy и более надёжное storage.
 
 ## Документация
 
@@ -99,4 +99,5 @@ npm run docs:dev
 - client telemetry считается недоверенной;
 - `intentScore` измеряет interaction quality, а не вероятность покупки;
 - JSONL не рассчитан на multi-process writes и долгий retention;
+- page token не имеет atomic one-time claim, idempotent retries и key rotation;
 - runtime policy versioning, shadow mode и cohorts пока не реализованы.

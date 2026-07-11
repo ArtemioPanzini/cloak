@@ -30,10 +30,12 @@ sequenceDiagram
 ```
 
 1. `GET /` создаёт visitor UUID, если signed cookie отсутствует или невалидна.
-2. Сервер выпускает HMAC-signed page token с timestamp и random nonce.
+2. Сервер выпускает HMAC-signed page token `{ v, jti, iat, exp, binding }`,
+   привязанный к текущей signed visitor cookie.
 3. `telemetry.js` собирает агрегаты до submit.
 4. JSON payload проходит type/range normalization.
-5. Backend строит server signals из headers, IP и token verification.
+5. Backend проверяет signature, embedded expiry и visitor binding; server dwell
+   строится только для полностью valid token.
 6. HMAC identifiers используются для history lookup.
 7. Pure rule engine рассчитывает score и decision.
 8. Audit записывается до отправки URL.
@@ -61,6 +63,9 @@ sequenceDiagram
 Hidden token подтверждает получение landing, но interaction fields отсутствуют.
 Coverage default no-JS request обычно равна `0.55`, поэтому policy выбирает
 `WHITEPAGE`, а не `BLOCK`.
+
+Direct submit без token или с token из другой visitor session также получает
+`WHITEPAGE`: non-valid token не проходит `OFFER` eligibility.
 
 ## Parser и internal errors
 

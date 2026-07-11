@@ -10,8 +10,8 @@ description: "Server, client и history evidence, уровень доверия 
 
 | Сигнал | Доверие | Использование | Ограничение |
 |---|---|---|---|
-| Подписанный page token | Высокое | Risk, coverage, server dwell, replay history | Бот может сначала получить страницу и валидный token |
-| Server dwell | Высокое | Behavior risk и intent | Долгое время само по себе не доказывает человека |
+| Подписанный page token | Высокое | `OFFER` eligibility, coverage, server dwell, replay history | Бот может сначала получить страницу, cookie и valid token |
+| Server dwell | Высокое | Behavior risk и intent | Рассчитывается только для fully valid token; долгое время не доказывает человека |
 | Signed visitor cookie | Среднее | Repeat и velocity history | Cookie можно удалить или не сохранить |
 | User-Agent | Среднее | Headless/scripted patterns | UA легко подделать |
 | `Accept`, `Accept-Language` | Низкое | Coverage | Заголовки можно воспроизвести |
@@ -48,6 +48,11 @@ Collector сохраняет агрегаты, а не полный trace. Не 
 | IP decisions за 30 секунд | Weak shared-network burst | Threshold выше identity thresholds |
 | Fingerprint submits за 5 минут | Audit/history context | Не блокирует одиночный repeat |
 | Page token previous uses | Replay risk | Редкий reuse допускается до отдельных thresholds |
+
+Page token привязан к signed visitor cookie. Копирование только token в другую
+visitor session даёт `visitor_mismatch`; копирование всей session credential или
+обычный bot flow через `GET /` всё ещё возможны, поэтому valid token не уменьшает
+automation risk.
 
 ## Что не считается сильным доказательством
 

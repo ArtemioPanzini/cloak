@@ -21,8 +21,8 @@ description: "Environment variables, defaults, ограничения и trust b
 
 | Variable | Type/default | Назначение | Примечание |
 |---|---|---|---|
-| `PAGE_TOKEN_SECRET` | string ≥24, dev value | HMAC page token | Заменить вне local development |
-| `HASH_SECRET` | string ≥24, dev value | HMAC visitor/fingerprint/IP/token keys | Rotation разрывает history continuity |
+| `PAGE_TOKEN_SECRET` | string ≥24, dev value | HMAC signature page token | Заменить вне local development |
+| `HASH_SECRET` | string ≥24, dev value | HMAC identifiers и page-token visitor binding | Rotation разрывает history и инвалидирует outstanding tokens |
 | `COOKIE_SECRET` | string ≥24, dev value | Signed `prelander_visit` cookie | Заменить вне local development |
 | `PAGE_TOKEN_TTL_MS` | integer, `600000` | Token TTL | `30000..86400000` ms |
 
