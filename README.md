@@ -2,7 +2,11 @@
 - https://chatgpt.com/c/6a5216f4-31a4-83eb-a01b-cfc99904ed72
 - https://chatgpt.com/share/6a522370-e2c4-83ed-8450-ac2658bdd883
 - https://chatgpt.com/share/6a52237a-1fa0-83ed-b000-57d127a7c5b8
-- 
+
+Todo:
+- mintlify docs
+- versioning runtime fraud-weights
+
 # Pre-lander Scoring Gate
 
 Минимальный pre-lander и объяснимый anti-automation / interaction-quality scoring backend на Node.js + TypeScript.
