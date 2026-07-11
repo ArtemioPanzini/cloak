@@ -2,7 +2,7 @@
 
 ## Current phase
 
-All six milestones are complete; final checkpoint recording is next.
+All six milestones and post-commit verification are complete.
 
 ## Baseline
 
@@ -27,12 +27,11 @@ All six milestones are complete; final checkpoint recording is next.
 
 ## In progress
 
-- Record the final implementation checkpoint and run fresh post-commit verification.
+- None.
 
 ## Next
 
-1. Commit the final README, landing and execution-log changes.
-2. Run post-commit verification and choose the branch integration action.
+1. Choose whether to merge, push or keep `agent/mintlify-documentation` for review.
 
 ## Decisions
 
@@ -79,7 +78,7 @@ git diff --check
 | 3. Reviewer docs | Complete | `docs: add reviewer evaluation guide` | `3f0cb8b` | `mint validate`; 11/11 scoring scenarios; path/threshold scans pass |
 | 4. Integrator docs | Complete | `docs: add integration guides` | `1b1ef7d` | `mint validate`; 16 config keys; audit-tail behavior verified |
 | 5. OpenAPI | Complete | `docs: add OpenAPI contract` | `648014e` | `mint validate`; 8/8 API and token contract tests; diff check pass |
-| 6. Finalization | Complete | `docs: finalize Mintlify documentation` | checkpoint pending | clean install; 20/20 tests; typecheck/build/docs validation; dual-server smoke |
+| 6. Finalization | Complete | `docs: finalize Mintlify documentation` | `70883ae` | clean install; 20/20 tests; typecheck/build/docs validation; dual-server smoke |
 
 ## Audit log
 
@@ -95,6 +94,7 @@ git diff --check
 - `2026-07-11`: Milestone 5 completed; OpenAPI 3.1, API overview and tested HTTP invariants validate successfully.
 - `2026-07-11`: Milestone 6 completed; README synchronized, four-tab docs and all OpenAPI operations smoke-tested, JS/no-JS flows wrote the expected audit decisions.
 - `2026-07-11`: Mintlify preview emits a non-blocking `CodeGroup has no children` warning only for the bodyless `303` response page; `mint validate` passes and a fictitious body was not added to the contract.
+- `2026-07-11`: Fresh post-commit release gate passed on `70883ae`: 20/20 tests, typecheck, source-only build, Mintlify validation and private-content scans.
 
 ## Smoke/demo checks
 
