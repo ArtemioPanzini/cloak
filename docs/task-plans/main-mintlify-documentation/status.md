@@ -2,11 +2,11 @@
 
 ## Current phase
 
-Planning complete; implementation not started.
+Milestone 1 complete; Milestone 2 is next.
 
 ## Baseline
 
-- Branch: `main`.
+- Planning branch: `main`; execution branch: `agent/mintlify-documentation`.
 - Design spec commit: `1065047 docs: design Mintlify documentation`.
 - Remote baseline: `origin/main` at `46cc31b` when planning started.
 - Worktree before task-pack creation: clean, with local branch ahead by the design-spec commit.
@@ -27,12 +27,12 @@ Planning complete; implementation not started.
 
 ## In progress
 
-- None. This run is planning-only.
+- None between checkpoint milestones.
 
 ## Next
 
-1. Execute Milestone 1 from `plans.md`: make package installation, build output and test discovery reproducible.
-2. Record validation and checkpoint commit before Milestone 2.
+1. Execute Milestone 2 from `plans.md`: create the minimal Mintlify shell and landing page.
+2. Validate `docs.json`, preview on port 3333 and record the checkpoint.
 
 ## Decisions
 
@@ -55,10 +55,10 @@ Planning complete; implementation not started.
 
 ## Known blockers and risks
 
-- `package-lock.json` contains private OpenAI Artifactory URLs.
-- `npm run build` emits `dist/tests`; Vitest can execute compiled test copies.
 - Mintlify is not installed or configured.
 - Manual OpenAPI can drift unless contract assertions remain a release gate.
+- Mintlify dev dependencies currently report 12 moderate advisories; `npm audit --omit=dev` reports 0 runtime vulnerabilities.
+- Mintlify's `twoslash` dependency declares TypeScript 5/6 peer support while the project uses TypeScript 7; installation succeeds with an npm peer warning.
 
 ## Validation commands
 
@@ -75,7 +75,7 @@ git diff --check
 
 | Milestone | Status | Planned commit | Actual commit | Validation |
 |---|---|---|---|---|
-| 1. Reproducible toolchain | Pending | `build: make docs toolchain reproducible` | — | Pending |
+| 1. Reproducible toolchain | Complete | `build: make docs toolchain reproducible` | checkpoint pending | 19/19 tests; typecheck/build pass; clean install pass; runtime audit 0 |
 | 2. Mintlify shell | Pending | `docs: scaffold Mintlify navigation` | — | Pending |
 | 3. Reviewer docs | Pending | `docs: add reviewer evaluation guide` | — | Pending |
 | 4. Integrator docs | Pending | `docs: add integration guides` | — | Pending |
@@ -87,6 +87,9 @@ git diff --check
 - `2026-07-11`: Design spec approved by user.
 - `2026-07-11`: Planning pack created; implementation deliberately not started.
 - `2026-07-11`: Missing Jaidu template files recorded as a skill-package limitation.
+- `2026-07-11`: Isolated worktree created on `agent/mintlify-documentation`; baseline 19/19 passed.
+- `2026-07-11`: Milestone 1 completed; private registry URLs removed, Mint CLI pinned, source-only build and unique test discovery verified.
+- `2026-07-11`: Clean install reports dev-only advisories/TypeScript peer warning; runtime audit remains clean.
 
 ## Smoke/demo checks
 

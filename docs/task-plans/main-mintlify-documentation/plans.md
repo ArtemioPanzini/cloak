@@ -55,7 +55,7 @@ Modify:
 
 ## Milestone 1: Reproducible toolchain
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Goal:** Обеспечить публичный clean install, source-only build и уникальный test discovery.
 
@@ -72,7 +72,7 @@ Modify:
 
 **Produces:** `docs:dev`, `docs:validate`, source-only build, exclusion `dist/**`.
 
-- [ ] **Step 1: Capture the failing baseline**
+- [x] **Step 1: Capture the failing baseline**
 
 ```bash
 npm run build
@@ -81,7 +81,7 @@ npm test
 
 Expected before fix: `dist/tests` exists and Vitest can report 8 files/38 executions rather than 4 files/19 unique tests.
 
-- [ ] **Step 2: Create source-only build config**
+- [x] **Step 2: Create source-only build config**
 
 `tsconfig.build.json`:
 
@@ -97,7 +97,7 @@ Expected before fix: `dist/tests` exists and Vitest can report 8 files/38 execut
 }
 ```
 
-- [ ] **Step 3: Exclude generated tests**
+- [x] **Step 3: Exclude generated tests**
 
 `vitest.config.ts`:
 
@@ -111,7 +111,7 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 4: Update scripts and pin Mint CLI**
+- [x] **Step 4: Update scripts and pin Mint CLI**
 
 Set these `package.json` values:
 
@@ -130,7 +130,7 @@ Set these `package.json` values:
 
 Preserve all other scripts and dependencies unchanged.
 
-- [ ] **Step 5: Verify boundaries**
+- [x] **Step 5: Verify boundaries**
 
 ```bash
 npm run build
@@ -146,13 +146,13 @@ Expected: no `dist/tests`; 4 files and 19 tests pass; typecheck/build exit 0.
 **Files:**
 - Modify: `package-lock.json`
 
-- [ ] **Step 1: Preserve the stale lock outside Git**
+- [x] **Step 1: Preserve the stale lock outside Git**
 
 ```bash
 mv package-lock.json /tmp/prelander-package-lock.internal.json
 ```
 
-- [ ] **Step 2: Generate from public npm**
+- [x] **Step 2: Generate from public npm**
 
 ```bash
 npm install --package-lock-only --ignore-scripts --registry=https://registry.npmjs.org
@@ -160,7 +160,7 @@ npm install --package-lock-only --ignore-scripts --registry=https://registry.npm
 
 Expected: new lock includes `mint@4.2.687`.
 
-- [ ] **Step 3: Reject private hosts**
+- [x] **Step 3: Reject private hosts**
 
 ```bash
 if rg -n 'packages\.applied-caas-gateway1|internal\.api\.openai\.org' package-lock.json; then exit 1; fi
@@ -168,7 +168,7 @@ if rg -n 'packages\.applied-caas-gateway1|internal\.api\.openai\.org' package-lo
 
 Expected: no output, exit 0.
 
-- [ ] **Step 4: Test with empty cache**
+- [x] **Step 4: Test with empty cache**
 
 ```bash
 tmp_dir=$(mktemp -d)
@@ -179,7 +179,7 @@ test -x "$tmp_dir/node_modules/.bin/mint"
 
 Expected: install exits 0; Mint binary exists.
 
-- [ ] **Step 5: Validate milestone**
+- [x] **Step 5: Validate milestone**
 
 ```bash
 npm ci --registry=https://registry.npmjs.org
