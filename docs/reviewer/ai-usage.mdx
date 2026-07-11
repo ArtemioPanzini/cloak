@@ -14,24 +14,6 @@ policy. Синхронное решение посетителю должно о
 когорты и предлагает новую конфигурацию, которую можно проверить, активировать
 или откатить без изменения кода.
 
-## Целевой lifecycle
-
-```mermaid
-flowchart LR
-  A[Decision + policyVersion] --> B[Audit event]
-  B --> C[Outcome join]
-  C --> D[Cohort dataset]
-  D --> E[AI analysis]
-  E --> F[Policy proposal]
-  F --> G[Historical replay]
-  G --> H[Shadow evaluation]
-  H --> I[Human approval]
-  I --> J[Limited candidate cohort]
-  J --> K{Result}
-  K -->|better| L[Promote policy]
-  K -->|worse| M[Rollback]
-```
-
 AI не принимает решение `OFFER`, `WHITEPAGE` или `BLOCK` для отдельного request.
 Его результат — versioned policy proposal с объяснением, ожидаемым эффектом и
 данными, на которых построена рекомендация.
