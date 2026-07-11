@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Milestone 1 complete; Milestone 2 is next.
+Milestone 2 complete; Milestone 3 is next.
 
 ## Baseline
 
@@ -31,8 +31,8 @@ Milestone 1 complete; Milestone 2 is next.
 
 ## Next
 
-1. Execute Milestone 2 from `plans.md`: create the minimal Mintlify shell and landing page.
-2. Validate `docs.json`, preview on port 3333 and record the checkpoint.
+1. Execute Milestone 3 from `plans.md`: add reviewer evaluation and design documentation.
+2. Validate reviewer navigation, numbers, code paths and required scenarios.
 
 ## Decisions
 
@@ -55,7 +55,6 @@ Milestone 1 complete; Milestone 2 is next.
 
 ## Known blockers and risks
 
-- Mintlify is not installed or configured.
 - Manual OpenAPI can drift unless contract assertions remain a release gate.
 - Mintlify dev dependencies currently report 12 moderate advisories; `npm audit --omit=dev` reports 0 runtime vulnerabilities.
 - Mintlify's `twoslash` dependency declares TypeScript 5/6 peer support while the project uses TypeScript 7; installation succeeds with an npm peer warning.
@@ -75,8 +74,8 @@ git diff --check
 
 | Milestone | Status | Planned commit | Actual commit | Validation |
 |---|---|---|---|---|
-| 1. Reproducible toolchain | Complete | `build: make docs toolchain reproducible` | checkpoint pending | 19/19 tests; typecheck/build pass; clean install pass; runtime audit 0 |
-| 2. Mintlify shell | Pending | `docs: scaffold Mintlify navigation` | — | Pending |
+| 1. Reproducible toolchain | Complete | `build: make docs toolchain reproducible` | `bfd7709` | 19/19 tests; typecheck/build pass; clean install pass; runtime audit 0 |
+| 2. Mintlify shell | Complete | `docs: scaffold Mintlify navigation` | checkpoint pending | `mint validate`; preview HTTP 200 on 3333 |
 | 3. Reviewer docs | Pending | `docs: add reviewer evaluation guide` | — | Pending |
 | 4. Integrator docs | Pending | `docs: add integration guides` | — | Pending |
 | 5. OpenAPI | Pending | `docs: add OpenAPI contract` | — | Pending |
@@ -90,14 +89,15 @@ git diff --check
 - `2026-07-11`: Isolated worktree created on `agent/mintlify-documentation`; baseline 19/19 passed.
 - `2026-07-11`: Milestone 1 completed; private registry URLs removed, Mint CLI pinned, source-only build and unique test discovery verified.
 - `2026-07-11`: Clean install reports dev-only advisories/TypeScript peer warning; runtime audit remains clean.
+- `2026-07-11`: Milestone 2 completed; Mintlify config validates and landing preview returned HTTP 200 on port 3333.
 
 ## Smoke/demo checks
 
 | Check | Status | Evidence |
 |---|---|---|
 | App on port 3000 | Deferred | Execution phase |
-| Mintlify on port 3333 | Not run | Mintlify not implemented |
-| Four navigation tabs | Not run | Mintlify not implemented |
+| Mintlify on port 3333 | Pass | Landing preview HTTP 200; process stopped after smoke |
+| Four navigation tabs | Partial | Overview implemented; remaining tabs are later milestones |
 | OpenAPI pages | Not run | OpenAPI not implemented |
 | JS decision flow | Deferred | Final smoke |
 | No-JS redirect flow | Deferred | Final smoke |

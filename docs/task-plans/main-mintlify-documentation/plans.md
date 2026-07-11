@@ -202,7 +202,7 @@ git commit -m "build: make docs toolchain reproducible"
 
 ## Milestone 2: Mintlify shell
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Goal:** Создать валидный docs root и базовую 60-секундную landing page без ссылок на ещё не созданные разделы.
 
@@ -216,7 +216,7 @@ git commit -m "build: make docs toolchain reproducible"
 - Create: `docs/docs.json`
 - Create: `docs/index.mdx`
 
-- [ ] **Step 1: Create `docs.json`**
+- [x] **Step 1: Create `docs.json`**
 
 ```json
 {
@@ -240,7 +240,7 @@ git commit -m "build: make docs toolchain reproducible"
 }
 ```
 
-- [ ] **Step 2: Create the initial landing page**
+- [x] **Step 2: Create the initial landing page**
 
 Frontmatter:
 
@@ -259,7 +259,7 @@ Body requirements:
 - note that client signals are untrusted;
 - no full quickstart and no weight table.
 
-- [ ] **Step 3: Validate and preview**
+- [x] **Step 3: Validate and preview**
 
 ```bash
 npm run docs:validate
@@ -268,7 +268,7 @@ npm run docs:dev
 
 Expected: validator exits 0; preview listens on 3333.
 
-- [ ] **Step 4: Smoke landing in a second shell**
+- [x] **Step 4: Smoke landing in a second shell**
 
 ```bash
 curl -fsS http://127.0.0.1:3333/ > /tmp/mintlify-index.html

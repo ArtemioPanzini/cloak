@@ -1,0 +1,19 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Pre-lander Scoring Gate",
+  "colors": {
+    "primary": "#0F766E",
+    "light": "#14B8A6",
+    "dark": "#5EEAD4"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Обзор",
+        "icon": "house",
+        "pages": ["index"]
+      }
+    ]
+  }
+}
