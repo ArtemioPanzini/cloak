@@ -431,7 +431,7 @@ Expected after Milestone 2: 4 files and 33 tests pass when the full suite is run
 
 ## Milestone 3: Current documentation synchronization
 
-**Status:** `[~]` — current docs, OpenAPI and patch notes validate; checkpoint pending.
+**Status:** `[x]` — committed as `a0c7c70`.
 
 **Goal:** Сделать README, Mintlify и OpenAPI точным отражением новой runtime policy.
 
@@ -511,7 +511,7 @@ git commit -m "docs: document bound page-token security"
 
 ## Milestone 4: Release verification
 
-**Status:** `[ ]`
+**Status:** `[x]` — all automated gates, dependency audits and live HTTP smoke complete.
 
 **Goal:** Подтвердить полный regression gate и записать воспроизводимые evidence.
 

@@ -160,11 +160,11 @@ curl -fsS http://127.0.0.1:3000/health
 
 Manual/HTTP-client checks:
 
-- `[ ]` Normal landing and submit return the offer URL only.
-- `[ ]` Reusing the token with a fresh visitor cookie returns whitepage.
-- `[ ]` Submitting without JavaScript preserves `303 Location`.
-- `[ ]` Latest audit row contains `[REDACTED]` instead of the literal token.
-- `[ ]` No smoke-generated `data/audit.jsonl` change is staged.
+- `[x]` Normal landing and submit return the offer URL only.
+- `[x]` Reusing the token with a fresh visitor cookie returns whitepage.
+- `[x]` Submitting without JavaScript preserves `303 Location`.
+- `[x]` Latest audit row contains `[REDACTED]` instead of the literal token.
+- `[x]` No smoke-generated `data/audit.jsonl` change is staged.
 
 ## Acceptance gates
 

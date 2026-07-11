@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Milestone 3 documentation synchronization is ready for checkpoint.
+All four milestones are complete; release verification record is ready to commit.
 
 ## Baseline
 
@@ -28,15 +28,22 @@ Milestone 3 documentation synchronization is ready for checkpoint.
 - `[x]` Runtime integration committed as `5ad80a9`.
 - `[x]` README, Mintlify, OpenAPI and patch notes synchronized.
 - `[x]` Mintlify validation and current-doc semantic scans pass.
+- `[x]` Documentation checkpoint committed as `a0c7c70`.
+- `[x]` Fresh `npm ci` completed with the known TypeScript peer warning.
+- `[x]` Full suite passes: 33/33 across 4 files.
+- `[x]` Focused security suite passes: 32/32 across 3 files.
+- `[x]` Typecheck, build, Mintlify validation and diff check pass.
+- `[x]` Full audit reports 12 moderate dev advisories; runtime audit reports 0.
+- `[x]` Built-app smoke returned security headers and healthy JSON response.
 
 ## In progress
 
-- Milestone 3 documentation checkpoint commit.
+- None; only the verification-record checkpoint remains to be created.
 
 ## Next
 
-1. Commit the Milestone 3 documentation synchronization.
-2. Start Milestone 4 full release verification and live smoke.
+1. Commit the Milestone 4 verification record.
+2. Choose branch integration or review disposition without pushing automatically.
 
 ## Decisions
 
@@ -84,8 +91,8 @@ git diff --check
 |---|---|---|---|---|
 | 1. Bound token primitive | Complete | `security: bind page tokens to visitor sessions` | `5ad80a9` combined with Milestone 2 | 8/8 unit tests pass; initial typecheck exposed expected unmigrated callers |
 | 2. Decision/audit/HTTP integration | Complete | `security: enforce page-token offer eligibility` | `5ad80a9` | 33/33 full tests; typecheck and diff check pass |
-| 3. Documentation synchronization | Ready for checkpoint | `docs: document bound page-token security` | Pending | Mintlify validation and semantic scans pass |
-| 4. Release verification | Pending | `docs: record page-token security verification` | — | Not run |
+| 3. Documentation synchronization | Complete | `docs: document bound page-token security` | `a0c7c70` | Mintlify validation and semantic scans pass |
+| 4. Release verification | Complete | `docs: record page-token security verification` | Verification checkpoint | Fresh install; 33/33 tests; typecheck/build/docs; audits; live smoke |
 
 ## Audit log
 
@@ -102,23 +109,27 @@ git diff --check
 - `2026-07-11`: HTTP RED exposed missing issuance/headers and copied-token flow; integration GREEN produced 32/32 targeted tests and a clean typecheck.
 - `2026-07-11`: Combined runtime checkpoint `5ad80a9` created after 33/33 full tests passed.
 - `2026-07-11`: Current README, Mintlify pages, OpenAPI and `PATCH_NOTES.md` synchronized; structural validation and obsolete-claim scans passed.
+- `2026-07-11`: Documentation checkpoint `a0c7c70` created.
+- `2026-07-11`: Fresh `npm ci` succeeded with the known TypeScript 7/twoslash peer warning and 12 moderate dev advisories.
+- `2026-07-11`: Release gate passed: 33/33 full tests, 32/32 focused tests, typecheck, build, Mintlify validation and diff check.
+- `2026-07-11`: Dependency audits confirmed 12 moderate dev advisories and 0 runtime vulnerabilities.
+- `2026-07-11`: Built app served `private, no-store`, CSP and `X-Frame-Options: DENY`; `/health` returned `{"status":"ok"}`; process stopped cleanly via interrupt.
 
 ## Smoke/demo checks
 
 | Check | Status | Evidence |
 |---|---|---|
-| Same-session token reaches normal scoring | Pending | — |
-| Direct POST cannot reach offer | Pending | — |
-| Copied token cannot reach offer | Pending | — |
-| Audit redacts raw token | Pending | — |
-| Landing security headers | Pending | — |
-| JS URL-only contract | Pending | — |
-| No-JS `303` contract | Pending | — |
-| Mintlify/OpenAPI validation | Pending | — |
+| Same-session token reaches normal scoring | Pass | App integration test returns exact offer URL |
+| Direct POST cannot reach offer | Pass | App integration test returns whitepage and audits `missing` |
+| Copied token cannot reach offer | Pass | Different-cookie integration test returns whitepage |
+| Audit redacts raw token | Pass | Literal token absent; `[REDACTED]` asserted |
+| Landing security headers | Pass | Live built-app response contains cache, CSP and DENY headers |
+| JS URL-only contract | Pass | `200 text/plain` exact configured URL asserted |
+| No-JS `303` contract | Pass | `303 Location`, empty body and no-store asserted |
+| Mintlify/OpenAPI validation | Pass | `mint validate` exit 0 plus semantic scan |
 
 ## Resume instructions
 
-1. Confirm the Milestone 3 docs checkpoint exists and the worktree is otherwise clean.
-2. Run Milestone 4 automated release gates and focused security regressions.
-3. Smoke the built app and record exact dependency audit results.
-4. Update this file and commit the verification record.
+1. Confirm the verification-record checkpoint exists and the worktree is clean.
+2. Review the branch diff against `origin/main`.
+3. Choose merge, PR/push or keep-worktree disposition; no push without explicit user instruction.
