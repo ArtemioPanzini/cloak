@@ -1,0 +1,69 @@
+---
+title: "Дизайн сигналов"
+description: "Server, client и history evidence, уровень доверия и роль в решении."
+---
+
+Система не ищет один «магический» bot signal. Решение строится из нескольких
+категорий evidence с разным уровнем доверия.
+
+## Server signals
+
+| Сигнал | Доверие | Использование | Ограничение |
+|---|---|---|---|
+| Подписанный page token | Высокое | Risk, coverage, server dwell, replay history | Бот может сначала получить страницу и валидный token |
+| Server dwell | Высокое | Behavior risk и intent | Долгое время само по себе не доказывает человека |
+| Signed visitor cookie | Среднее | Repeat и velocity history | Cookie можно удалить или не сохранить |
+| User-Agent | Среднее | Headless/scripted patterns | UA легко подделать |
+| `Accept`, `Accept-Language` | Низкое | Coverage | Заголовки можно воспроизвести |
+| `Sec-Fetch-*`, Client Hints | Низкое | Coverage/consistency context | Поддерживаются не всеми браузерами |
+| IP hash | Низкое | Shared-network velocity | NAT и mobile networks объединяют пользователей |
+| Trusted geo/network headers | Низкое | Weak network context | Доступны только за настроенным reverse proxy |
+
+IP, geo и network type не читаются из JSON клиента. Enrichment headers
+учитываются только при `TRUST_ENRICHMENT_HEADERS=true`; proxy обязан удалить
+пользовательские значения и записать собственные.
+
+## Client signals
+
+| Сигнал | Использование | Почему полезен | Ограничение |
+|---|---|---|---|
+| `submittedMs`, `firstInteractionMs`, `stateChangedMs` | Intent, event order, coverage | Показывает связность короткого взаимодействия | Полностью контролируется клиентом |
+| `pageVisibleMs` | Intent | Отделяет преимущественно видимую страницу | Visibility API можно эмулировать |
+| Pointer/touch/keyboard counters | Intent и слабый risk | Поддерживает desktop, mobile и keyboard flows | События легко синтезировать |
+| `stateChanges` | Intent | Прямо связано с единственным заданием формы | Автоматизация может вызвать `change` |
+| `navigator.webdriver` | Automation risk | Известный automation indicator | Может быть скрыт или встречаться в testing tools |
+| Timezone/languages | Coverage/context | Проверяет полноту browser context | Не используется для geo matching |
+| Screen/hardware/touch | Device consistency | Находит несколько невозможных значений | Редкие реальные устройства дают необычные значения |
+| Coarse fingerprint | Repeat/velocity identifier | Связывает близкие повторные визиты | Не уникален, подделывается и меняется со средой |
+
+Collector сохраняет агрегаты, а не полный trace. Не записываются координаты
+мыши, содержимое клавиш, canvas, audio, fonts или browser geolocation.
+
+## History signals
+
+| Сигнал | Использование | False-positive control |
+|---|---|---|
+| Previous visitor decisions | Normal repeat и velocity | 1–3 обычных visit не считаются атакой |
+| Previous fingerprint decisions | Repeat и velocity | Сам fingerprint не является доказательством |
+| IP decisions за 30 секунд | Weak shared-network burst | Threshold выше identity thresholds |
+| Fingerprint submits за 5 минут | Audit/history context | Не блокирует одиночный repeat |
+| Page token previous uses | Replay risk | Редкий reuse допускается до отдельных thresholds |
+
+## Что не считается сильным доказательством
+
+Следующие признаки сами по себе не должны приводить к `BLOCK`:
+
+- VPN, proxy или hosting network;
+- несовпадение IP region и выбранного штата;
+- отсутствие mouse movement;
+- mobile touch без pointer movement;
+- один необычный fingerprint;
+- один повторный визит;
+- медленный submit;
+- отсутствие campaign parameter;
+- принадлежность к конкретному рекламному источнику.
+
+<Info>
+  Source-agnostic policy защищает от false positives и не создаёт отдельного
+  поведения для рекламных reviewer-ов или crawler-ов конкретной платформы.
+</Info>

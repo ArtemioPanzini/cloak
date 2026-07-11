@@ -1,0 +1,83 @@
+---
+title: "Trade-offs и развитие"
+description: "Почему выбраны rules и JSONL, где заканчиваются гарантии текущей версии."
+---
+
+## Rule-based вместо ML
+
+Нет размеченного dataset с подтверждёнными bot/conversion labels. ML без данных
+создал бы ложную точность и ухудшил объяснимость. Rule engine детерминирован,
+показывает каждый adjustment и легко проверяется table-driven tests.
+
+Следующий зрелый шаг — не «добавить модель», а сначала связать decisions с
+downstream conversion и подтверждёнными abuse outcomes, затем калибровать
+thresholds в shadow mode.
+
+## JSONL вместо database server
+
+Плюсы для take-home:
+
+- одна команда установки;
+- нет native bindings или отдельного сервиса;
+- audit читается обычными CLI tools;
+- repository boundary уже отделена от scorer-а.
+
+Минусы:
+
+- history целиком в памяти;
+- lookup `O(n)`;
+- нет multi-process coordination;
+- lookup и append не атомарны вместе;
+- нет retention, partitioning и query indexes.
+
+Для реального объёма потребуются transactional event store и shared velocity
+counters, например Postgres/ClickHouse плюс Redis на edge.
+
+## Coarse fingerprint
+
+Fingerprint объединяет UA, languages, timezone, screen и coarse hardware values.
+Он полезен только как слабый repeat/velocity key:
+
+- подделывается клиентом;
+- меняется при обновлении среды;
+- несколько пользователей могут совпасть;
+- необычное значение не доказывает automation.
+
+Поэтому cookie и signed server timing имеют больший смысл, а hard block требует
+независимого evidence.
+
+## Interaction quality вместо purchase intent
+
+Один dropdown не позволяет предсказывать коммерческое намерение. `intentScore`
+измеряет только связность короткого взаимодействия: state change, input event,
+event order, visibility и dwell.
+
+## Network enrichment
+
+Приложение не вызывает ASN/VPN provider. Оно может принять `x-geo-region` и
+`x-network-type` только от собственного trusted proxy. Default выключен, а
+network evidence имеет малый вес.
+
+## Error handling
+
+Decision endpoints fail safe на whitepage, чтобы внутренние ошибки не раскрывали
+score. Если storage недоступен, текущая decision может не попасть в audit — это
+осознанное ограничение, которое требует мониторинга и durable queue в production.
+
+## Планируемое развитие
+
+Следующие возможности не реализованы:
+
+- immutable `engineVersion`, `policyVersion`, `signalSchemaVersion` в audit;
+- runtime activation/rollback scoring policy;
+- shadow evaluation и sticky cohorts;
+- conversion feedback и threshold calibration;
+- shared rate limits;
+- retention и HMAC key rotation;
+- browser E2E и fuzz/property testing;
+- admin-only audit explorer и OpenTelemetry.
+
+<Warning>
+  Этот список — roadmap, а не руководство по доступным функциям. Текущие weights
+  находятся в TypeScript-коде и меняются только через новую сборку.
+</Warning>

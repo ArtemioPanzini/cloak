@@ -13,6 +13,33 @@
         "tab": "Обзор",
         "icon": "house",
         "pages": ["index"]
+      },
+      {
+        "tab": "Проверка решения",
+        "icon": "clipboard-check",
+        "groups": [
+          {
+            "group": "Быстрая проверка",
+            "pages": ["reviewer/evaluation-guide"]
+          },
+          {
+            "group": "Дизайн решения",
+            "pages": [
+              "reviewer/architecture",
+              "reviewer/signals",
+              "reviewer/scoring",
+              "reviewer/edge-cases"
+            ]
+          },
+          {
+            "group": "Качество и процесс",
+            "pages": [
+              "reviewer/testing",
+              "reviewer/tradeoffs",
+              "reviewer/ai-usage"
+            ]
+          }
+        ]
       }
     ]
   }

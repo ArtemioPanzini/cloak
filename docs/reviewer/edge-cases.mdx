@@ -1,0 +1,60 @@
+---
+title: "Edge cases"
+description: "Ожидаемые решения для mobile, VPN, no-JS, repeat и automation сценариев."
+---
+
+Edge cases проверяют не только detection, но и устойчивость к false positives.
+
+| Сценарий | Ключевые данные | Решение | Обоснование |
+|---|---|---|---|
+| Чистый живой пользователь | Valid token, dwell ~1.8 s, dropdown change, pointer input | `OFFER` | Высокие coverage и intent, risk около нуля |
+| Очень быстрый кликер | Server dwell 180 ms при остальных полных данных | `WHITEPAGE` | Сильный behavior risk, но недостаточно независимых групп для hard block |
+| Headless bot без мыши | Headless UA, webdriver, 100 ms, нулевые interactions | `BLOCK` | Automation плюс behavior дают несколько evidence groups |
+| Живой пользователь под VPN | VPN, geo mismatch, нормальные token/dwell/input | `OFFER` | VPN слабый, mismatch нейтральный |
+| Mobile с медленным submit | Touch input, mobile UA, 45 s dwell, no mouse movement | `OFFER` | Touch — active input; slow dwell не повышает automation risk |
+| Подозрительный fingerprint/device | Нулевой screen, невозможные hardware values, invalid fingerprint | `WHITEPAGE` | Несколько device anomalies дают fallback, но одна группа не даёт hard block |
+| JavaScript отключён | Valid hidden token, state, headers, без client telemetry | `WHITEPAGE` | Coverage около `0.55`; отсутствие JS не является bot proof |
+| Обычный repeat fingerprint | Одна предыдущая decision без burst | `OFFER` | Normal repeat уменьшает risk и повышает intent |
+
+## Submit без движения мыши
+
+Нулевой `pointerMoves` нейтрален, если есть pointer down, touch, keyboard или
+dropdown change. Это покрывает mobile, accessibility и аккуратный desktop click.
+
+## Медленный пользователь
+
+Dwell до двух минут получает положительный intent delta; более долгий остаётся
+слегка положительным. Медленный submit не увеличивает automation risk.
+
+## VPN и geo mismatch
+
+VPN добавляет только `+5`. Geo mismatch записывается как reason code с delta `0`.
+Выбранный штат не обязан совпадать с IP region: пользователь может путешествовать,
+использовать corporate network или выбирать штат назначения.
+
+## No-JS
+
+Server-rendered форма содержит hidden page token, поэтому native submit остаётся
+доступным. Без telemetry coverage ниже `0.60`, и система выбирает whitepage.
+
+## Repeat и velocity
+
+Один repeat считается нормальным. Risk появляется при скорости:
+
+- 2–3 identity submits за 30 секунд: слабый `+10`;
+- 4–9: `+45`;
+- 10+: `+80` и немедленный `BLOCK`.
+
+Shared IP имеет отдельный высокий threshold, чтобы NAT не создавал массовые false
+positives.
+
+## Одна сильная automation group
+
+Headless UA и webdriver могут довести risk выше `75`, но оба относятся к группе
+`automation`. Без второй независимой suspicious group policy возвращает
+`WHITEPAGE`, а не `BLOCK`.
+
+<Note>
+  Test fixtures — детерминированные модели. Они показывают выбранную policy, но
+  не доказывают точность на реальном рекламном трафике без downstream labels.
+</Note>

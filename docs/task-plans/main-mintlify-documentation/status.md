@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Milestone 2 complete; Milestone 3 is next.
+Milestone 3 complete; Milestone 4 is next.
 
 ## Baseline
 
@@ -31,8 +31,8 @@ Milestone 2 complete; Milestone 3 is next.
 
 ## Next
 
-1. Execute Milestone 3 from `plans.md`: add reviewer evaluation and design documentation.
-2. Validate reviewer navigation, numbers, code paths and required scenarios.
+1. Execute Milestone 4 from `plans.md`: add integrator quickstart, configuration, lifecycle, audit, privacy and troubleshooting.
+2. Validate every environment variable and observed audit behavior.
 
 ## Decisions
 
@@ -75,8 +75,8 @@ git diff --check
 | Milestone | Status | Planned commit | Actual commit | Validation |
 |---|---|---|---|---|
 | 1. Reproducible toolchain | Complete | `build: make docs toolchain reproducible` | `bfd7709` | 19/19 tests; typecheck/build pass; clean install pass; runtime audit 0 |
-| 2. Mintlify shell | Complete | `docs: scaffold Mintlify navigation` | checkpoint pending | `mint validate`; preview HTTP 200 on 3333 |
-| 3. Reviewer docs | Pending | `docs: add reviewer evaluation guide` | — | Pending |
+| 2. Mintlify shell | Complete | `docs: scaffold Mintlify navigation` | `251a8c2` | `mint validate`; preview HTTP 200 on 3333 |
+| 3. Reviewer docs | Complete | `docs: add reviewer evaluation guide` | checkpoint pending | `mint validate`; 11/11 scoring scenarios; path/threshold scans pass |
 | 4. Integrator docs | Pending | `docs: add integration guides` | — | Pending |
 | 5. OpenAPI | Pending | `docs: add OpenAPI contract` | — | Pending |
 | 6. Finalization | Pending | `docs: finalize Mintlify documentation` or no commit | — | Pending |
@@ -90,6 +90,7 @@ git diff --check
 - `2026-07-11`: Milestone 1 completed; private registry URLs removed, Mint CLI pinned, source-only build and unique test discovery verified.
 - `2026-07-11`: Clean install reports dev-only advisories/TypeScript peer warning; runtime audit remains clean.
 - `2026-07-11`: Milestone 2 completed; Mintlify config validates and landing preview returned HTTP 200 on port 3333.
+- `2026-07-11`: Milestone 3 completed; eight reviewer pages and complete reviewer navigation validate successfully.
 
 ## Smoke/demo checks
 
@@ -97,7 +98,7 @@ git diff --check
 |---|---|---|
 | App on port 3000 | Deferred | Execution phase |
 | Mintlify on port 3333 | Pass | Landing preview HTTP 200; process stopped after smoke |
-| Four navigation tabs | Partial | Overview implemented; remaining tabs are later milestones |
+| Four navigation tabs | Partial | Overview and Solution Review implemented |
 | OpenAPI pages | Not run | OpenAPI not implemented |
 | JS decision flow | Deferred | Final smoke |
 | No-JS redirect flow | Deferred | Final smoke |

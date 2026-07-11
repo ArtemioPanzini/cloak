@@ -288,7 +288,7 @@ git commit -m "docs: scaffold Mintlify navigation"
 
 ## Milestone 3: Reviewer documentation
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Goal:** Дать проверяющему reproducible checklist и полное объяснение rubric decisions.
 
@@ -302,7 +302,7 @@ git commit -m "docs: scaffold Mintlify navigation"
 - Create: `docs/reviewer/evaluation-guide.mdx`
 - Create: `docs/reviewer/architecture.mdx`
 
-- [ ] **Step 1: Write evaluation guide**
+- [x] **Step 1: Write evaluation guide**
 
 Use title `Проверка решения за 10 минут`. Include exact commands `npm ci`, `npm test`, typecheck, build and dev; expected unique test count; JS/no-JS results; audit path; rubric-to-code mapping with these paths:
 
@@ -313,11 +313,11 @@ src/storage/decision-repository.ts -> tests/repository.test.ts
 src/app.ts -> tests/app.test.ts
 ```
 
-- [ ] **Step 2: Write architecture page**
+- [x] **Step 2: Write architecture page**
 
 Include module responsibility table, pipeline, pure scorer/policy boundary, I/O orchestration, JSONL limitations and links to implementation/tests.
 
-- [ ] **Step 3: Validate entry pages directly**
+- [x] **Step 3: Validate entry pages directly**
 
 ```bash
 npm run docs:validate
@@ -331,19 +331,19 @@ rg -n 'src/security/page-token.ts|src/storage/decision-repository.ts' docs/revie
 - Create: `docs/reviewer/scoring.mdx`
 - Create: `docs/reviewer/edge-cases.mdx`
 
-- [ ] **Step 1: Document signal categories**
+- [x] **Step 1: Document signal categories**
 
 Create server/client/history tables with signal, trust level, purpose, use and limitation. Explicitly cover VPN, geo mismatch, no mouse, unusual fingerprint, repeat visit and campaign parameters as weak/neutral evidence.
 
-- [ ] **Step 2: Document exact scoring**
+- [x] **Step 2: Document exact scoring**
 
 Copy current deltas from `src/scoring/rules.ts`, base intent `40`, coverage components, evidence groups and thresholds from `src/scoring/policy.ts`. State invalid/future/malformed token `+35` without absolute `OFFER` prohibition.
 
-- [ ] **Step 3: Document required edge cases**
+- [x] **Step 3: Document required edge cases**
 
 For each of the eight required scenarios include inputs, important adjustments, expected decision and false-positive rationale.
 
-- [ ] **Step 4: Check numbers and scenarios**
+- [x] **Step 4: Check numbers and scenarios**
 
 ```bash
 rg -n '45|35|15|0\.60|75|40' docs/reviewer/scoring.mdx
@@ -359,19 +359,19 @@ npm run docs:validate
 - Create: `docs/reviewer/ai-usage.mdx`
 - Modify: `docs/docs.json`
 
-- [ ] **Step 1: Document tests**
+- [x] **Step 1: Document tests**
 
 Describe suites, eight required cases, 19-test baseline, HTTP/token/repository coverage, duplicate-test fix and gaps: browser E2E, isolated fingerprint case, real repeat-request integration and boundary tests.
 
-- [ ] **Step 2: Document trade-offs**
+- [x] **Step 2: Document trade-offs**
 
 Cover rules versus ML, JSONL, fingerprint, interaction-quality proxy, concurrency, enrichment and planned policy versioning clearly marked unimplemented.
 
-- [ ] **Step 3: Document AI usage**
+- [x] **Step 3: Document AI usage**
 
 Describe AI-assisted tasks, rejected/corrected suggestions, human decisions and tests. Include only public share links; exclude `chatgpt.com/c/`.
 
-- [ ] **Step 4: Add the complete reviewer tab**
+- [x] **Step 4: Add the complete reviewer tab**
 
 Add tab `Проверка решения` with icon `clipboard-check` and groups:
 
@@ -381,7 +381,7 @@ Add tab `Проверка решения` with icon `clipboard-check` and groups
 Качество и процесс: reviewer/testing, reviewer/tradeoffs, reviewer/ai-usage
 ```
 
-- [ ] **Step 5: Validate reviewer section**
+- [x] **Step 5: Validate reviewer section**
 
 ```bash
 npm run docs:validate
