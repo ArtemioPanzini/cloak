@@ -70,7 +70,8 @@ Modify:
 - Create: `vitest.config.ts`
 - Modify: `package.json`
 
-**Produces:** `docs:dev`, `docs:validate`, source-only build, exclusion `dist/**`.
+**Produces:** `docs:dev`, `docs:validate`, source-only build, exclusions
+`**/dist/**` и `**/.worktrees/**`.
 
 - [x] **Step 1: Capture the failing baseline**
 
@@ -79,7 +80,8 @@ npm run build
 npm test
 ```
 
-Expected before fix: `dist/tests` exists and Vitest can report 8 files/38 executions rather than 4 files/19 unique tests.
+Expected before fix: generated tests or a nested worktree can be rediscovered,
+so Vitest reports duplicate files rather than the unique source suites.
 
 - [x] **Step 2: Create source-only build config**
 
@@ -106,7 +108,7 @@ import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    exclude: [...configDefaults.exclude, "dist/**"]
+    exclude: [...configDefaults.exclude, "**/dist/**", "**/.worktrees/**"]
   }
 });
 ```

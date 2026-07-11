@@ -95,6 +95,8 @@ git diff --check
 - `2026-07-11`: Milestone 6 completed; README synchronized, four-tab docs and all OpenAPI operations smoke-tested, JS/no-JS flows wrote the expected audit decisions.
 - `2026-07-11`: Mintlify preview emits a non-blocking `CodeGroup has no children` warning only for the bodyless `303` response page; `mint validate` passes and a fictitious body was not added to the contract.
 - `2026-07-11`: Fresh post-commit release gate passed on `70883ae`: 20/20 tests, typecheck, source-only build, Mintlify validation and private-content scans.
+- `2026-07-11`: Local merge fetched three remote README commits and preserved their new public AI-share URL on `reviewer/ai-usage`.
+- `2026-07-11`: Merged-main verification exposed nested `.worktrees/**/tests` discovery (8 files/40 tests). A red/green check extended Vitest exclusions; with both nested worktree and stale `dist/tests` present, discovery returned 4 files and 20/20 tests.
 
 ## Smoke/demo checks
 

@@ -29,6 +29,7 @@ Pass: clean install exits 0, Mint CLI exists, private hosts are absent.
 
 ```bash
 npm test
+npx vitest list --config vitest.config.ts --filesOnly
 npm run typecheck
 npm run build
 test ! -d dist/tests
@@ -36,8 +37,9 @@ test ! -d dist/tests
 
 Pass:
 
-- source test files execute once;
-- 19 existing tests plus new contract tests pass;
+- discovery lists only the four root `tests/*.test.ts` suites, even when a nested
+  `.worktrees/` checkout or stale `dist/tests` exists;
+- 20 tests, including the new health contract assertion, pass once;
 - typecheck and build exit 0;
 - production build does not emit `dist/tests`.
 

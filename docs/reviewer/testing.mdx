@@ -3,9 +3,10 @@ title: "Тестирование"
 description: "Обязательные scoring-сценарии, HTTP contract, token и repository coverage."
 ---
 
-Baseline содержит 19 уникальных тестов в четырёх source test files. Production
-build не компилирует `tests/`, а Vitest исключает `dist/**`, поэтому один тест не
-запускается повторно из generated output.
+Baseline содержит 20 уникальных тестов в четырёх source test files. Production
+build не компилирует `tests/`, а Vitest исключает `**/dist/**` и вложенные
+`**/.worktrees/**`, поэтому один тест не запускается повторно из generated output
+или изолированного worktree.
 
 ## Test suites
 
